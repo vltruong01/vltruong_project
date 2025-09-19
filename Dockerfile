@@ -26,4 +26,4 @@ EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=5s --retries=3 CMD curl -fsS http://127.0.0.1:${PORT}/health || exit 1
 
 # 6) Run (Koyeb sẽ set PORT thật khi chạy)
-CMD ["uvicorn","app:app","--host","0.0.0.0","--port","${PORT}"]
+CMD ["python","-c","import os, uvicorn; uvicorn.run('app:app', host='0.0.0.0', port=int(os.getenv('PORT', 8080)))"]
