@@ -1,0 +1,34 @@
+# môi trường & build cache
+venv/
+.env
+.git/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# file nặng không cần cho runtime
+*.zip
+*.tar
+*.gz
+*.7z
+*.rar
+*.mp4
+*.avi
+*.mov
+*.mkv
+*.wav
+*.mp3
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.bmp
+*.tif
+*.tiff
+*.webp
+data/*
+!data/profile.json
+node_modules/
+dist/
+build/

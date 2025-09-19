@@ -1,0 +1,28 @@
+app = "vlt-chatbot"
+primary_region = "sin"
+
+[build]
+
+[http_service]
+  internal_port = 8000
+  force_https = true
+  auto_stop_machines = false
+  auto_start_machines = true
+  min_machines_running = 1
+  strategy = "immediate"
+
+  [[http_service.checks]]
+    interval     = "15s"
+    timeout      = "60s"
+    grace_period = "60s"
+    method       = "GET"
+    path         = "/health"
+    protocol     = "http"
+
+[[vm]]
+  cpu_kind  = "shared"
+  cpus      = 1
+  memory_mb = 1024
+
+[env]
+  PROFILE_PATH = "data/profile.json"

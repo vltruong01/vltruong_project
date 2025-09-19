@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual env
+venv/
+.env
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Node / frontend (nếu có)
+node_modules/
+dist/
+build/
+
+# Archives
+*.zip
+*.tar
+*.gz
+*.7z
+*.rar
+
+# Media nặng (nếu có backup cục bộ, không cần push lên GitHub)
+*.mp4
+*.avi
+*.mov
+*.mkv
+*.wav
+*.mp3
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.bmp
+*.tif
+*.tiff
+*.webp
+
+# Data (chỉ giữ file cần thiết)
+data/*
+!data/profile.json
