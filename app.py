@@ -172,62 +172,46 @@ HTML_FORM = """
   :root{
     --bg:#0b1220; --panel:#121a2b; --text:#eaf0ff; --muted:#95a1c6; --accent:#4c7fff;
     --bubble-user:#3558ff; --bubble-bot:#1a2438; --border:#26314a;
-    --toggle-bg: #2d3748;
-    --toggle-checked-bg: var(--accent);
-    --toggle-handle: white;
-    --toggle-border: var(--border);
+    --toggle-bg:#2d3748; --toggle-checked-bg:var(--accent);
+    --toggle-handle:white; --toggle-border:var(--border);
   }
   body{margin:0; background:var(--bg); color:var(--text); font-family:system-ui,Arial; height:100vh; display:flex; flex-direction:column;}
   header{padding:14px 18px; border-bottom:1px solid var(--border); background:var(--panel); display:flex; justify-content:space-between; align-items:center;}
-  header .title{ font-weight:700; }
-  header .subtitle{ color:var(--muted); font-size:13px; }
+  header .title{font-weight:700;} header .subtitle{color:var(--muted); font-size:13px;}
 
-  /* ==== màu link trong chat ==== */
-  .bubble a {
-    color: #4ade80;          /* xanh lá sáng */
-    font-weight: 600;
-    text-decoration: underline;
-  }
-  .bubble a:visited {
-    color: #a78bfa;          /* tím lilac nhạt */
-  }
-  .bubble a:hover {
-    color: #f87171;          /* đỏ nhạt khi hover */
-  }
-  .bubble a:active {
-    color: #ef4444;          /* đỏ đậm khi click */
-  }
-  /* ============================= */
+  /* link trong chat */
+  .bubble a{color:#4ade80;font-weight:600;text-decoration:underline;}
+  .bubble a:visited{color:#a78bfa;}
+  .bubble a:hover{color:#f87171;}
+  .bubble a:active{color:#ef4444;}
 
-  .lang-switch {display: flex; align-items: center; gap: 12px;}
-  .lang-label {font-size: 14px; color: var(--muted); font-weight: 500;}
-  .toggle-container {position: relative; display: inline-block; width: 70px; height: 30px; background: var(--toggle-bg); border: 1px solid var(--toggle-border); border-radius: 25px; cursor: pointer; overflow: hidden;}
-  .toggle-option {position: absolute; top: 0; width: 50%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; z-index: 2; transition: color 0.3s ease;}
-  .toggle-option.vn {left: 0; color: var(--text);}
-  .toggle-option.en {right: 0; color: var(--muted);}
-  .toggle-slider {position: absolute; top: 2px; left: 2px; width: 33px; height: 26px; background: var(--toggle-checked-bg); border-radius: 20px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1;}
-  .toggle-container.english .toggle-slider {left: calc(100% - 35px);}
-  .toggle-container.english .toggle-option.vn {color: var(--muted);}
-  .toggle-container.english .toggle-option.en {color: var(--text);}
-  .toggle-container:hover {border-color: var(--accent);}
-  .toggle-checkbox {position: absolute; opacity: 0; width: 0; height: 0;}
+  .lang-switch{display:flex; align-items:center; gap:12px;}
+  .lang-label{font-size:14px; color:var(--muted); font-weight:500;}
+  .toggle-container{position:relative; display:inline-block; width:70px; height:30px; background:var(--toggle-bg); border:1px solid var(--toggle-border); border-radius:25px; cursor:pointer; overflow:hidden;}
+  .toggle-option{position:absolute; top:0; width:50%; height:100%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; z-index:2; transition:color 0.3s ease;}
+  .toggle-option.vn{left:0;color:var(--text);} .toggle-option.en{right:0;color:var(--muted);}
+  .toggle-slider{position:absolute; top:2px; left:2px; width:33px; height:26px; background:var(--toggle-checked-bg); border-radius:20px; transition:all 0.3s cubic-bezier(0.4,0,0.2,1); z-index:1;}
+  .toggle-container.english .toggle-slider{left:calc(100% - 35px);}
+  .toggle-container.english .toggle-option.vn{color:var(--muted);} .toggle-container.english .toggle-option.en{color:var(--text);}
+  .toggle-container:hover{border-color:var(--accent);} .toggle-checkbox{position:absolute; opacity:0; width:0; height:0;}
 
   .container{flex:1; display:flex; justify-content:center; align-items:stretch; padding:12px;}
   .chat{width:min(900px,100%); display:flex; flex-direction:column; border:1px solid var(--border); border-radius:16px; overflow:hidden; background:var(--panel);}
   .messages{flex:1; padding:16px; overflow-y:auto; scroll-behavior:smooth; display:flex; flex-direction:column; gap:12px; max-height:450px;}
   .bubble{max-width:75%; padding:12px 14px; border-radius:14px; line-height:1.45; white-space:pre-wrap; box-shadow:0 3px 10px rgba(0,0,0,.15);}
-  .row{ display:flex; gap:10px; align-items:flex-end; }
-  .row.user{ justify-content:flex-end; }
-  .row.user .bubble{ background:var(--bubble-user); }
-  .row.bot  .bubble{ background:var(--bubble-bot); border:1px solid var(--border); }
+  .row{display:flex; gap:10px; align-items:flex-end;}
+  .row.user{justify-content:flex-end;} .row.user .bubble{background:var(--bubble-user);}
+  .row.bot .bubble{background:var(--bubble-bot); border:1px solid var(--border);}
   .avatar{width:32px; height:32px; border-radius:50%; overflow:hidden; flex:0 0 auto; border:1px solid var(--border); background:#243152;}
-  .avatar img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .avatar img{width:100%; height:100%; object-fit:cover; display:block;}
   .composer{border-top:1px solid var(--border); padding:12px; background:var(--panel); display:flex; gap:10px;}
   textarea{flex:1; resize:none; background:#0e1526; color:var(--text); border:1px solid var(--border); border-radius:12px; padding:12px 14px; min-height:48px; outline:none;}
   button{background:var(--accent); color:white; border:none; border-radius:12px; padding:12px 16px; font-weight:600; cursor:pointer;}
-  .footer-note {color: var(--muted); font-size: 12px; padding: 4px 12px; border-top: 1px dashed var(--border); display: flex; justify-content: center; align-items: center;}
-  .suggest-wrap {display: flex; gap: 6px; align-items: center; margin: 17px;}
-  select {background:#0e1526; color:#cfe0ff; border:1px solid var(--border); border-radius:8px; padding:4px 8px; font-size:12px; max-width:100%;}
+
+  /* footer nhỏ gọn */
+  .footer-note{color:var(--muted); font-size:12px; padding:2px 8px; border-top:1px dashed var(--border); display:flex; justify-content:center; align-items:center;}
+  .suggest-wrap{display:flex; gap:6px; align-items:center; margin:4px 0;}
+  select{background:#0e1526; color:#cfe0ff; border:1px solid var(--border); border-radius:6px; padding:2px 6px; font-size:12px; max-width:100%;}
   </style>
 </head>
 <body>
@@ -272,179 +256,42 @@ HTML_FORM = """
   </div>
 
   <script>
-  const $messages = document.getElementById('messages');
-  const $input = document.getElementById('input');
-  const $send = document.getElementById('sendBtn');
-  const $langToggle = document.getElementById('langToggle');
-  const $toggleContainer = document.getElementById('toggleContainer');
-  const $suggest = document.getElementById('suggestSelect');
+  const $messages=document.getElementById('messages');
+  const $input=document.getElementById('input');
+  const $send=document.getElementById('sendBtn');
+  const $langToggle=document.getElementById('langToggle');
+  const $toggleContainer=document.getElementById('toggleContainer');
+  const $suggest=document.getElementById('suggestSelect');
+  let loadingRow=null; let currentLang="vi";
 
-  let loadingRow = null;
-  let currentLang = "vi";
+  const SUGGESTIONS_VI=["Bạn là ai?","Bạn tên đầy đủ là gì?","Bạn bao nhiêu tuổi?","Bạn sinh ra ở đâu?","Quê quán của bạn ở đâu?","Bạn học trường gì?","Bạn học ngành gì?","Bạn có tính cách thế nào?","Bạn thích môn thể thao nào?","Món ăn yêu thích của bạn?","Gia đình bạn có mấy người?","Triết lý sống của bạn là gì?","Bạn nói được những ngôn ngữ nào?","Bạn có bạn gái chưa?","Ước mơ nghề nghiệp của bạn?","Email của bạn?","Số điện thoại của bạn?"];
+  const SUGGESTIONS_EN=["Who are you?","What is your full name?","How old are you?","Where were you born?","Where is your hometown?","Which university did you study?","What was your major?","What is your personality like?","What sport do you like?","What is your favorite food?","How many people are in your family?","What is your life motto?","What languages do you speak?","Do you have a girlfriend?","What is your career goal?","What is your email?","What is your phone number?"];
 
-  // Suggestions for both languages
-  const SUGGESTIONS_VI = [
-    "Bạn là ai?","Bạn tên đầy đủ là gì?","Bạn bao nhiêu tuổi?","Bạn sinh ra ở đâu?",
-    "Quê quán của bạn ở đâu?","Bạn học trường gì?","Bạn học ngành gì?","Bạn có tính cách thế nào?",
-    "Bạn thích môn thể thao nào?","Món ăn yêu thích của bạn?","Gia đình bạn có mấy người?",
-    "Triết lý sống của bạn là gì?","Bạn nói được những ngôn ngữ nào?","Bạn có bạn gái chưa?",
-    "Ước mơ nghề nghiệp của bạn?","Email của bạn?","Số điện thoại của bạn?"
-  ];
+  function populateSelect(){while($suggest.options.length>1){$suggest.remove(1);} (currentLang==='en'?SUGGESTIONS_EN:SUGGESTIONS_VI).forEach(q=>{const opt=document.createElement('option'); opt.value=q; opt.textContent=q; $suggest.appendChild(opt);});}
 
-  const SUGGESTIONS_EN = [
-    "Who are you?","What is your full name?","How old are you?","Where were you born?",
-    "Where is your hometown?","Which university did you study?","What was your major?",
-    "What is your personality like?","What sport do you like?","What is your favorite food?",
-    "How many people are in your family?","What is your life motto?","What languages do you speak?",
-    "Do you have a girlfriend?","What is your career goal?","What is your email?",
-    "What is your phone number?"
-  ];
-
-  function populateSelect(){
-    while($suggest.options.length > 1){ $suggest.remove(1); }
-    const list = currentLang === 'en' ? SUGGESTIONS_EN : SUGGESTIONS_VI;
-    list.forEach(q=>{
-      const opt = document.createElement('option');
-      opt.value = q; opt.textContent = q;
-      $suggest.appendChild(opt);
-    });
-  }
-
-  function setLang(lang){
-    currentLang = lang;
-    $langToggle.checked = (lang === 'en');
-    
-    if (lang === 'en') {
-      $toggleContainer.classList.add('english');
-      // đổi title/subtitle
-      document.getElementById('headerTitle').textContent = "🤖This is Vuong Loc Truong’s Chatbot :3";
-      document.getElementById('headerSubtitle').textContent = "You can ask about: hometown, education, hobbies, contact…";
-      // đổi UI khác
-      $input.placeholder = "Type a question… (Press Enter to send)";
-      $send.textContent = "Send";
-      document.querySelector('.footer-note span').textContent = "Suggested questions:";
-      $suggest.options[0].textContent = "Pick a suggestion";
-    } else {
-      $toggleContainer.classList.remove('english');
-      // đổi title/subtitle
-      document.getElementById('headerTitle').textContent = "🤖Đây là Chatbot của Vương Lộc Trường :3";
-      document.getElementById('headerSubtitle').textContent = "Bạn có thể hỏi về: quê quán, học vấn, sở thích, liên hệ…";
-      // đổi UI khác
-      $input.placeholder = "Nhập câu hỏi… (Enter để gửi)";
-      $send.textContent = "Gửi";
-      document.querySelector('.footer-note span').textContent = "Gợi ý câu hỏi:";
-      $suggest.options[0].textContent = "Chọn một câu hỏi gợi ý";
-    }
+  function setLang(lang){currentLang=lang;$langToggle.checked=(lang==='en');
+    if(lang==='en'){ $toggleContainer.classList.add('english'); document.getElementById('headerTitle').textContent="🤖This is Vuong Loc Truong’s Chatbot :3"; document.getElementById('headerSubtitle').textContent="You can ask about: hometown, education, hobbies, contact…"; $input.placeholder="Type a question… (Press Enter to send)"; $send.textContent="Send"; document.querySelector('.footer-note span').textContent="Suggested questions:"; $suggest.options[0].textContent="Pick a suggestion";}
+    else{ $toggleContainer.classList.remove('english'); document.getElementById('headerTitle').textContent="🤖Đây là Chatbot của Vương Lộc Trường :3"; document.getElementById('headerSubtitle').textContent="Bạn có thể hỏi về: quê quán, học vấn, sở thích, liên hệ…"; $input.placeholder="Nhập câu hỏi… (Enter để gửi)"; $send.textContent="Gửi"; document.querySelector('.footer-note span').textContent="Gợi ý câu hỏi:"; $suggest.options[0].textContent="Chọn một câu hỏi gợi ý";}
     populateSelect();
   }
 
-  // Click handler for toggle
-  $toggleContainer.addEventListener('click', (e) => {
-    e.preventDefault();
-    const newLang = currentLang === 'vi' ? 'en' : 'vi';
-    setLang(newLang);
-  });
+  $toggleContainer.addEventListener('click',(e)=>{e.preventDefault();setLang(currentLang==='vi'?'en':'vi');});
+  $langToggle.addEventListener('change',()=>{setLang($langToggle.checked?'en':'vi');});
 
-  // Also handle checkbox change for accessibility
-  $langToggle.addEventListener('change', () => {
-    setLang($langToggle.checked ? 'en' : 'vi');
-  });
+  function addMessage(text,who="bot"){const row=document.createElement('div'); row.className='row '+(who==='user'?'user':'bot'); const bubble=document.createElement('div'); bubble.className='bubble'; bubble.textContent=text; if(who==='user'){row.appendChild(bubble);} else{const av=document.createElement('div'); av.className='avatar'; const img=document.createElement('img'); img.src='/static/cutechatbot.png'; img.alt='bot'; av.appendChild(img); row.appendChild(av); row.appendChild(bubble);} $messages.appendChild(row); $messages.scrollTop=$messages.scrollHeight;}
 
-  function addMessage(text, who="bot"){
-    const row = document.createElement('div');
-    row.className = 'row ' + (who === 'user' ? 'user' : 'bot');
-    const bubble = document.createElement('div');
-    bubble.className = 'bubble';
-    bubble.textContent = text;
+  function setLoading(on){$send.disabled=on; if(on){if(!loadingRow){const row=document.createElement('div'); row.className='row bot'; const av=document.createElement('div'); av.className='avatar'; const img=document.createElement('img'); img.src='/static/cutechatbot.png'; img.alt='bot'; av.appendChild(img); const bubble=document.createElement('div'); bubble.className='bubble'; bubble.textContent=(currentLang==='en')?'Thinking…':'Đang suy nghĩ…'; row.appendChild(av); row.appendChild(bubble); $messages.appendChild(row); $messages.scrollTop=$messages.scrollHeight; loadingRow=row;}} else{if(loadingRow){loadingRow.remove(); loadingRow=null;}}}
 
-    if(who === 'user'){
-      row.appendChild(bubble);
-    } else {
-      const av = document.createElement('div');
-      av.className = 'avatar';
-      const img = document.createElement('img');
-      img.src = '/static/cutechatbot.png';
-      img.alt = 'bot';
-      av.appendChild(img);
-      row.appendChild(av);
-      row.appendChild(bubble);
-    }
-    $messages.appendChild(row);
-    $messages.scrollTop = $messages.scrollHeight;
-  }
+  async function ask(q){try{const resp=await fetch('/ask',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:q,lang:currentLang})}); const data=await resp.json(); return data.answer||(currentLang==='en'?"Sorry, I didn't catch that.":"Xin lỗi, mình chưa rõ câu hỏi.");}catch(e){console.error(e); return(currentLang==='en')?"Connection error.":"Có lỗi kết nối.";}}
 
-  function setLoading(on){
-    $send.disabled = on;
-    if(on){
-      if(!loadingRow){
-        const row = document.createElement('div');
-        row.className = 'row bot';
-        const av = document.createElement('div');
-        av.className = 'avatar';
-        const img = document.createElement('img');
-        img.src = '/static/cutechatbot.png'; img.alt = 'bot';
-        av.appendChild(img);
-        const bubble = document.createElement('div');
-        bubble.className = 'bubble';
-        bubble.textContent = (currentLang === 'en') ? 'Thinking…' : 'Đang suy nghĩ…';
-        row.appendChild(av); row.appendChild(bubble);
-        $messages.appendChild(row);
-        $messages.scrollTop = $messages.scrollHeight;
-        loadingRow = row;
-      }
-    } else {
-      if(loadingRow){ loadingRow.remove(); loadingRow = null; }
-    }
-  }
+  async function onSend(){const q=$input.value.trim(); if(!q)return; addMessage(q,'user'); $input.value=""; $input.focus(); setLoading(true); const a=await ask(q); setLoading(false); addMessage(a,'bot'); $suggest.value="";}
 
-  async function ask(q){
-    try{
-      const resp = await fetch('/ask', {
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ question: q, lang: currentLang })
-      });
-      const data = await resp.json();
-      return data.answer || (currentLang === 'en' ? "Sorry, I didn't catch that." : "Xin lỗi, mình chưa rõ câu hỏi.");
-    }catch(e){
-      console.error(e);
-      return (currentLang === 'en') ? "Connection error." : "Có lỗi kết nối.";
-    }
-  }
-
-  async function onSend(){
-    const q = $input.value.trim();
-    if(!q) return;
-    addMessage(q, 'user');
-    $input.value = ""; $input.focus();
-
-    setLoading(true);
-    const a = await ask(q);
-    setLoading(false);
-    addMessage(a, 'bot');
-
-    $suggest.value = "";
-  }
-
-  $suggest.addEventListener('change', ()=>{
-    const q = $suggest.value;
-    if(!q) return;
-    $input.value = q;
-    onSend();
-  });
-
-  $send.addEventListener('click', onSend);
-  $input.addEventListener('keydown', (e)=>{
-    if(e.key === 'Enter' && !e.shiftKey){
-      e.preventDefault();
-      onSend();
-    }
-  });
-
-  setLang('vi');     // default VN
-  populateSelect();
+  $suggest.addEventListener('change',()=>{const q=$suggest.value; if(!q)return; $input.value=q; onSend();});
+  $send.addEventListener('click',onSend);
+  $input.addEventListener('keydown',(e)=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();onSend();}});
+  setLang('vi'); populateSelect();
   </script>
-  </body>
+</body>
 </html>
 """
 
