@@ -1,13 +1,24 @@
-# môi trường & build cache
+# Virtual env & build cache
 venv/
 .env
-.git/
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 
-# file nặng không cần cho runtime
+# Git metadata
+.git/
+.gitignore
+
+# Data: bỏ hết trừ profile.json
+data/*
+!data/profile.json
+
+# Node/build
+node_modules/
+dist/
+build/
+
 *.zip
 *.tar
 *.gz
@@ -19,16 +30,3 @@ __pycache__/
 *.mkv
 *.wav
 *.mp3
-*.jpg
-*.jpeg
-*.png
-*.gif
-*.bmp
-*.tif
-*.tiff
-*.webp
-data/*
-!data/profile.json
-node_modules/
-dist/
-build/

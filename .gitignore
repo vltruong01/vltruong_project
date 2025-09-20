@@ -14,7 +14,7 @@ Thumbs.db
 .vscode/
 .idea/
 
-# Node / frontend (nếu có)
+# Node / frontend
 node_modules/
 dist/
 build/
@@ -26,21 +26,13 @@ build/
 *.7z
 *.rar
 
-# Media nặng (nếu có backup cục bộ, không cần push lên GitHub)
+# Media nặng (cho phép ảnh; chỉ chặn video/audio)
 *.mp4
 *.avi
 *.mov
 *.mkv
 *.wav
 *.mp3
-*.jpg
-*.jpeg
-*.png
-*.gif
-*.bmp
-*.tif
-*.tiff
-*.webp
 
 # Data (chỉ giữ file cần thiết)
 data/*
