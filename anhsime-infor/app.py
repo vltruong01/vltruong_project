@@ -16,7 +16,7 @@ HTML = """
   <title>Anhsime • Information</title>
 
   <meta property="og:title" content="Anhsime — Information" />
-  <meta property="og:description" content="Tổng hợp liên kết của Anhsime: Facebook, Zalo, Instagram, TikTok, Chatbot…" />
+  <meta property="og:description" content="Tổng hợp liên kết của Anhsime: Zalo, Instagram, TikTok, Chatbot…" />
   <meta property="og:type" content="website" />
   <meta name="theme-color" content="#111827" />
 
@@ -30,11 +30,17 @@ HTML = """
         #0b1220;
     }
 
-    /* nút link tổng thể gọn */
-    .link-btn { display:flex; justify-content:center; align-items:center; gap:8px; }
-    .link-btn img { width:18px; height:18px; }
+    /* nút link tổng thể (nhỉnh hơn bản cũ một chút) */
+    .link-btn {
+      display:flex; justify-content:center; align-items:center; gap:9px;
+      font-size:15px; font-weight:600;
+      padding:12px 16px;             /* cao hơn chút */
+      border-radius:11px;
+      transition: all .2s ease;
+    }
+    .link-btn img { width:20px; height:20px; }
 
-    /* Modal (dùng bản chi tiết) */
+    /* Modal */
     .modal {
       position:fixed; inset:0; background:rgba(0,0,0,0.6);
       display:none; justify-content:center; align-items:center; z-index:50;
@@ -45,98 +51,82 @@ HTML = """
     }
     .modal h2 { font-size:16px; font-weight:700; margin-bottom:10px; }
 
-    /* item có icon trái + text + nút phải, không rớt dòng */
+    /* item list */
     .list-item {
       display:flex; align-items:center; justify-content:space-between;
-      gap:10px; margin:10px 0; padding:8px 10px;
+      gap:10px; margin:11px 0; padding:9px 11px;
       border:1px solid #334155; border-radius:8px; background:#0f172a;
-      font-size:13px;
+      font-size:13.5px;
     }
     .list-item .left {
       display:flex; align-items:center; gap:8px;
       flex:1 1 auto; min-width:0;
-      max-width: calc(100% - 90px); /* luôn chừa chỗ cho nút */
+      max-width: calc(100% - 90px);
     }
-    .list-item .left img { width:20px; height:20px; flex:0 0 auto; }
+    .list-item .left img { width:21px; height:21px; flex:0 0 auto; }
     .left span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 
     .copy-btn, .view-btn {
       flex:0 0 auto; width:74px; white-space:nowrap;
       background:#3b82f6; color:#fff; border:none; border-radius:6px;
-      padding:4px 6px; font-size:12px; line-height:1; cursor:pointer; text-align:center;
+      padding:5px 7px; font-size:12.5px; line-height:1; cursor:pointer; text-align:center;
     }
     .download-link {
       display:inline-block; margin-top:10px;
-      background:#10b981; color:white; padding:6px 12px;
-      border-radius:6px; font-size:13px; text-decoration:none;
+      background:#10b981; color:white; padding:7px 13px;
+      border-radius:6px; font-size:13.5px; text-decoration:none;
     }
-    .qr-img { width:250px; max-width:90%; margin:10px auto; border-radius:8px; }
+    .qr-img { width:240px; max-width:90%; margin:10px auto; border-radius:8px; }
   </style>
 </head>
 <body class="min-h-screen text-slate-100 antialiased">
   <main class="mx-auto w-[640px] max-w-[95vw] px-4 pt-4 pb-3">
     <section class="bg-slate-900/60 backdrop-blur rounded-2xl border border-slate-700/60 shadow-xl p-5 md:p-6 text-center">
 
-      <!-- Avatar (gọn) -->
-      <div class="mx-auto w-[142px] h-[142px] rounded-full ring-4 ring-blue-500/30 overflow-hidden shadow-lg">
+      <!-- Avatar -->
+      <div class="mx-auto w-[145px] h-[145px] rounded-full ring-4 ring-blue-500/30 overflow-hidden shadow-lg">
         <img alt="avatar" class="w-full h-full object-cover" src="/static/avatar.jpg" />
       </div>
 
       <h1 class="mt-4 text-2xl md:text-3xl font-bold tracking-tight">Nguyễn Ngọc Ánh</h1>
-      <p class="mt-1 text-slate-300 text-[14px]">Đây là infor của mình ^^</p>
+      <p class="mt-1 text-slate-300 text-[14.5px]">Đây là infor của mình ^^</p>
 
-      <!-- Liên kết (gọn) -->
-      <div class="mt-4 space-y-2">
+      <!-- Liên kết -->
+      <div class="mt-5 space-y-3">
 
-        <!-- Chatbot -->
         <a href="https://anhsime-chatbot.fly.dev/" target="_blank" rel="noopener"
-           class="link-btn w-full py-2.5 px-4 rounded-xl font-semibold text-[15px]
-                  border border-indigo-500/50 bg-indigo-600/20 hover:bg-indigo-600/30 transition">
+           class="link-btn w-full border border-indigo-500/50 bg-indigo-600/20 hover:bg-indigo-600/30">
           🤖 Chatbot giới thiệu Anhsime
         </a>
 
-        <a href="https://www.facebook.com/anhsimee" target="_blank" rel="noopener"
-           class="link-btn w-full py-2.5 px-4 rounded-xl font-semibold text-[15px]
-                  border border-blue-500/40 bg-blue-600/20 hover:bg-blue-600/30 transition">
-          <img src="/static/icons/facebook.png" alt="Facebook"/>Facebook
-        </a>
-
         <a href="https://zalo.me/84945529606" target="_blank" rel="noopener"
-           class="link-btn w-full py-2.5 px-4 rounded-xl font-semibold text-[15px]
-                  border border-cyan-500/40 bg-cyan-600/20 hover:bg-cyan-600/30 transition">
+           class="link-btn w-full border border-cyan-500/40 bg-cyan-600/20 hover:bg-cyan-600/30">
           <img src="/static/icons/zalo.png" alt="Zalo"/>Zalo
         </a>
 
         <a href="https://www.instagram.com/anhsimee" target="_blank" rel="noopener"
-           class="link-btn w-full py-2.5 px-4 rounded-xl font-semibold text-[15px]
-                  border border-pink-500/40 bg-pink-600/20 hover:bg-pink-600/30 transition">
+           class="link-btn w-full border border-pink-500/40 bg-pink-600/20 hover:bg-pink-600/30">
           <img src="/static/icons/instagram.png" alt="Instagram"/>Instagram
         </a>
 
         <a href="https://www.tiktok.com/@anhsime" target="_blank" rel="noopener"
-           class="link-btn w-full py-2.5 px-4 rounded-xl font-semibold text-[15px]
-                  border border-rose-500/40 bg-rose-600/20 hover:bg-rose-600/30 transition">
+           class="link-btn w-full border border-rose-500/40 bg-rose-600/20 hover:bg-rose-600/30">
           <img src="/static/icons/tiktok.png" alt="TikTok"/>TikTok
         </a>
 
         <a href="https://locket.camera/links/h6TKJzCoGGVz9n9u6" target="_blank" rel="noopener"
-           class="link-btn w-full py-2.5 px-4 rounded-xl font-semibold text-[15px]
-                  border border-yellow-500/40 bg-yellow-600/20 hover:bg-yellow-600/30 transition">
+           class="link-btn w-full border border-yellow-500/40 bg-yellow-600/20 hover:bg-yellow-600/30">
           <img src="/static/icons/locket.png" alt="Locket"/>Locket
         </a>
 
-        <!-- Games -->
         <button onclick="openModal('gameModal')" 
-           class="link-btn w-full py-2.5 px-4 rounded-xl font-semibold text-[15px]
-                  border border-green-500/40 bg-green-600/20 hover:bg-green-600/30 transition">
+           class="link-btn w-full border border-green-500/40 bg-green-600/20 hover:bg-green-600/30">
           🎮 Các game đang chơi
         </button>
 
-        <!-- Bank/Payments -->
         <button onclick="openModal('bankModal')" 
-           class="link-btn w-full py-2.5 px-4 rounded-xl font-semibold text-[15px]
-                  border border-emerald-500/40 bg-emerald-600/20 hover:bg-emerald-600/30 transition">
-          💳 Tài khoản thanh toán
+           class="link-btn w-full border border-emerald-500/40 bg-emerald-600/20 hover:bg-emerald-600/30">
+          💳 Tài khoản ngân hàng
         </button>
       </div>
 
@@ -146,7 +136,7 @@ HTML = """
     </section>
   </main>
 
-  <!-- Modal: Games (phiên bản chi tiết) -->
+  <!-- Modal: Games -->
   <div id="gameModal" class="modal" onclick="backdropClose(event, 'gameModal')">
     <div class="modal-content">
       <h2>🎮 Các game đang chơi</h2>
@@ -167,11 +157,11 @@ HTML = """
         <button class="copy-btn" onclick="copyText('anhsime')">Copy tên</button>
       </div>
 
-      <button class="mt-2 px-3 py-2 bg-gray-500 rounded-lg text-sm" onclick="closeModal('gameModal')">Đóng</button>
+      <button class="mt-3 px-3 py-2 bg-gray-500 rounded-lg text-sm" onclick="closeModal('gameModal')">Đóng</button>
     </div>
   </div>
 
-  <!-- Modal: Bank/Payments (phiên bản chi tiết + xem QR trong modal) -->
+  <!-- Modal: Bank -->
   <div id="bankModal" class="modal" onclick="backdropClose(event, 'bankModal')">
     <div class="modal-content">
       <h2>💳 Tài khoản thanh toán</h2>
@@ -192,11 +182,11 @@ HTML = """
         <button class="view-btn" onclick="showQR('/static/qr/qr_momo.jpg')">Xem QR</button>
       </div>
 
-      <button class="mt-2 px-3 py-2 bg-gray-500 rounded-lg text-sm" onclick="closeModal('bankModal')">Đóng</button>
+      <button class="mt-3 px-3 py-2 bg-gray-500 rounded-lg text-sm" onclick="closeModal('bankModal')">Đóng</button>
     </div>
   </div>
 
-  <!-- Modal: Hiển thị QR + nút tải -->
+  <!-- Modal: QR -->
   <div id="qrModal" class="modal" onclick="backdropClose(event, 'qrModal')">
     <div class="modal-content">
       <h2>📷 QR Thanh toán</h2>

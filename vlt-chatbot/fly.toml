@@ -1,13 +1,15 @@
-# vlt-chatbot/fly.toml
 app = "vlt-chatbot"
 primary_region = "sin"
+
+[build]
 
 [http_service]
   internal_port = 8000
   force_https = true
-  auto_stop_machines = false   # luôn bật
+  auto_stop_machines = true        # <— tự tắt khi rảnh
   auto_start_machines = true
-  min_machines_running = 1
+  min_machines_running = 0         # <— cho phép về 0
+  strategy = "immediate"
 
   [[http_service.checks]]
     interval     = "15s"
@@ -20,9 +22,7 @@ primary_region = "sin"
 [[vm]]
   cpu_kind  = "shared"
   cpus      = 1
-  memory_mb = 256
+  memory_mb = 512                  # <— bắt đầu với 512MB; nếu OOM, đổi lại 1024
 
 [env]
   PROFILE_PATH = "data/profile.json"
-  OMP_NUM_THREADS = "1"
-  MKL_NUM_THREADS = "1"
