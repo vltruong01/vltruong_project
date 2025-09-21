@@ -4,6 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from typing import Dict, List, Tuple
 import json, os, re, unicodedata
+from fastapi.middleware.cors import CORSMiddleware
 
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
@@ -149,6 +150,19 @@ def fallback(lang: str) -> str:
 
 # ---------- FastAPI app ----------
 app = FastAPI(title="Personal Chatbot", version="0.5.0-no-auto-translate")
+
+# 👇 Bật CORS
+origins = [
+    "https://vlt-infor.fly.dev",   # cho phép frontend infor gọi API
+    "http://localhost:8000",       # khi dev local
+]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,      # domain được phép
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/health")
 def _health():
