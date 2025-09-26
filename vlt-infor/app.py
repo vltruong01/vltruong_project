@@ -111,7 +111,6 @@ HTML = """
       <div class="countdown">Còn <span id="count">60</span> giây</div>
       <div class="progress"><div id="bar"></div></div>
       <p id="status" class="mt-2 text-sm text-slate-300">Nó vừa mới ngủ dậy 🥱</p>
-      <button class="btn" onclick="goNow()">Đi ngay</button>
     </div>
   </div>
 
@@ -160,7 +159,6 @@ HTML = """
           clearInterval(chatbotPoll);
           chatbotTimer = null;
           chatbotPoll  = null;
-          $s.textContent = "⏭️ Hết thời gian, chuyển hướng…";
           window.location.assign(CHATBOT_URL);
         }
       }, 1000);
