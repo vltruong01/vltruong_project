@@ -87,9 +87,11 @@ HTML = """
       <p class="mt-1 text-slate-300 text-[14.5px]">Đây là infor của mình ^^</p>
 
       <div class="mt-5 space-y-3">
-        <a href="https://anhsime-chatbot.fly.dev/" target="_blank" class="link-btn w-full border border-indigo-500/50 bg-indigo-600/20 hover:bg-indigo-600/30">
+        <!-- CHỈ ĐỔI CHỖ NÀY: chatbot -> mở modal -->
+        <button onclick="openModal('chatbotModal')" class="link-btn w-full border border-indigo-500/50 bg-indigo-600/20 hover:bg-indigo-600/30">
           🤖 Chatbot giới thiệu Anhsime
-        </a>
+        </button>
+
         <a href="https://zalo.me/84945529606" target="_blank" class="link-btn w-full border border-cyan-500/40 bg-cyan-600/20 hover:bg-cyan-600/30">
           <img src="/static/icons/zalo.png"/>Zalo
         </a>
@@ -113,6 +115,15 @@ HTML = """
       <p class="mt-4 text-xs text-slate-400 text-center">© 2025 Anhsime • All rights reserved</p>
     </section>
   </main>
+
+  <!-- THÊM MỚI: Modal Chatbot chưa hoạt động -->
+  <div id="chatbotModal" class="modal" onclick="backdropClose(event, 'chatbotModal')">
+    <div class="modal-content">
+      <h2>🤖 Chatbot này chưa hoạt động</h2>
+      <p class="text-slate-300 text-[14.5px]">Hiện tại chatbot của Anhsime chưa được bật. Bạn quay lại sau nha ^^</p>
+      <button class="mt-3 px-3 py-2 bg-gray-500 rounded-lg text-sm" onclick="closeModal('chatbotModal')">Đóng</button>
+    </div>
+  </div>
 
   <!-- Modal: Games -->
   <div id="gameModal" class="modal" onclick="backdropClose(event, 'gameModal')">

@@ -54,6 +54,37 @@ HTML = """
 
     /* Avatar modal */
     .avatar-img { max-width:90vw; max-height:80vh; border-radius:12px; }
+
+    /* ===== Bank modal + QR modal: giống format Anhsime ===== */
+    .modal h2 { font-size:18px; font-weight:700; margin-bottom:12px; }
+
+    .list-item {
+      display:flex; align-items:center; justify-content:space-between;
+      gap:12px; margin:12px 0; padding:11px 14px;
+      border:1px solid #334155; border-radius:9px; background:#0f172a;
+      font-size:15px;
+    }
+    .list-item .left {
+      display:flex; align-items:center; gap:10px;
+      flex:1 1 auto; min-width:0;
+      max-width: calc(100% - 100px);
+    }
+    .list-item .left img { width:24px; height:24px; flex:0 0 auto; }
+    .left span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+    .view-btn {
+      flex:0 0 auto; width:85px; white-space:nowrap;
+      background:#3b82f6; color:#fff; border:none; border-radius:7px;
+      padding:7px 9px; font-size:14px; line-height:1; cursor:pointer; text-align:center;
+    }
+
+    .download-link {
+      display:inline-block; margin-top:12px;
+      background:#10b981; color:white; padding:8px 14px;
+      border-radius:7px; font-size:14px; text-decoration:none;
+    }
+    .qr-img { width:260px; max-width:90%; margin:12px auto; border-radius:9px; }
+    /* ===== End Bank modal format ===== */
   </style>
 </head>
 <body class="min-h-screen text-slate-100 antialiased">
@@ -71,28 +102,36 @@ HTML = """
       <!-- Liên kết -->
       <div class="mt-6 space-y-3">
         <a href="https://www.facebook.com/vltruong01/" target="_blank" rel="noopener"
-           class="link-btn w-full py-3.5 px-5 rounded-xl font-semibold text-[17px]
+           class="link-btn w-full py-2.5 px-5 rounded-xl font-semibold text-[17px]
                   border border-blue-500/40 bg-blue-600/20 hover:bg-blue-600/30 transition">
           <img src="/static/icons/facebook.png" alt="Facebook"/>Facebook
         </a>
         <a href="https://zalo.me/84869183424" target="_blank" rel="noopener"
-           class="link-btn w-full py-3.5 px-5 rounded-xl font-semibold text-[17px]
+           class="link-btn w-full py-2.5 px-5 rounded-xl font-semibold text-[17px]
                   border border-cyan-500/40 bg-cyan-600/20 hover:bg-cyan-600/30 transition">
           <img src="/static/icons/zalo.png" alt="Zalo"/>Zalo
         </a>
         <a href="https://www.instagram.com/102vl_truong" target="_blank" rel="noopener"
-           class="link-btn w-full py-3.5 px-5 rounded-xl font-semibold text-[17px]
+           class="link-btn w-full py-2.5 px-5 rounded-xl font-semibold text-[17px]
                   border border-pink-500/40 bg-pink-600/20 hover:bg-pink-600/30 transition">
           <img src="/static/icons/instagram.png" alt="Instagram"/>Instagram
         </a>
         <a href="https://www.tiktok.com/@vltruong1" target="_blank" rel="noopener"
-           class="link-btn w-full py-3.5 px-5 rounded-xl font-semibold text-[17px]
+           class="link-btn w-full py-2.5 px-5 rounded-xl font-semibold text-[17px]
                   border border-rose-500/40 bg-rose-600/20 hover:bg-rose-600/30 transition">
           <img src="/static/icons/tiktok.png" alt="TikTok"/>TikTok
         </a>
+
+        <!-- Bank (ngay trên Chatbot) -->
+        <button onclick="openModal('bankModal')"
+           class="link-btn w-full py-2.5 px-5 rounded-xl font-semibold text-[17px]
+                  border border-emerald-500/50 bg-emerald-600/20 hover:bg-emerald-600/30 transition">
+          💳 Tài khoản thanh toán
+        </button>
+
         <!-- Chatbot -->
-        <button onclick="openChatbot()" 
-           class="link-btn w-full py-3.5 px-5 rounded-xl font-semibold text-[17px]
+        <button onclick="openChatbot()"
+           class="link-btn w-full py-2.5 px-5 rounded-xl font-semibold text-[17px]
                   border border-indigo-500/50 bg-indigo-600/20 hover:bg-indigo-600/30 transition">
           🤖 Chatbot giới thiệu VLT
         </button>
@@ -111,6 +150,32 @@ HTML = """
       <div class="countdown">Còn <span id="count">60</span> giây</div>
       <div class="progress"><div id="bar"></div></div>
       <p id="status" class="mt-2 text-sm text-slate-300">Nó vừa mới ngủ dậy 🥱</p>
+    </div>
+  </div>
+
+  <!-- Modal: Bank (giống Anhsime) -->
+  <div id="bankModal" class="modal" onclick="backdropClose(event, 'bankModal')">
+    <div class="modal-content">
+      <h2>💳 Tài khoản thanh toán</h2>
+      <div class="list-item">
+        <div class="left"><img src="/static/icons/bidv.png"/><span>BIDV</span></div>
+        <button class="view-btn" onclick="showQR('/static/qr/qr_bidv.jpg')">Xem QR</button>
+      </div>
+      <div class="list-item">
+        <div class="left"><img src="/static/icons/momo.png"/><span>MoMo</span></div>
+        <button class="view-btn" onclick="showQR('/static/qr/qr_momo.jpg')">Xem QR</button>
+      </div>
+      <button class="mt-3 px-3 py-2 bg-gray-500 rounded-lg text-sm" onclick="closeModal('bankModal')">Đóng</button>
+    </div>
+  </div>
+
+  <!-- Modal: QR (giống Anhsime) -->
+  <div id="qrModal" class="modal" onclick="backdropClose(event, 'qrModal')">
+    <div class="modal-content">
+      <h2>📷 QR Thanh toán</h2>
+      <img id="qrImage" src="" alt="QR Code" class="qr-img"/>
+      <a id="qrDownload" href="" download class="download-link">⬇️ Tải QR</a>
+      <button class="mt-2 px-3 py-2 bg-gray-500 rounded-lg text-sm" onclick="closeModal('qrModal')">Đóng</button>
     </div>
   </div>
 
@@ -134,6 +199,12 @@ HTML = """
 
     function showAvatar(){ openModal('avatarModal'); }
     function goNow(){ window.location.assign(CHATBOT_URL); }
+
+    function showQR(path){
+      document.getElementById('qrImage').src = path;
+      document.getElementById('qrDownload').href = path;
+      openModal('qrModal');
+    }
 
     function openChatbot(){
       openModal('chatbotModal');
