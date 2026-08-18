@@ -1,9 +1,8 @@
 {
   "fallback": {
     "vi": "Xin lỗi, mình chưa rõ câu hỏi. Bạn có thể hỏi cụ thể hơn không?",
-    "en": "Sorry, I’m not sure I understood. Could you ask more specifically?"
+    "en": "Sorry, I'm not sure I understood. Could you ask more specifically?"
   },
-
   "intents": [
     {
       "name": "greeting",
@@ -12,8 +11,8 @@
         "en": ["hello", "hi", "hey", "good morning", "good afternoon", "good evening", "morning", "yo", "sup"]
       },
       "answer": {
-        "vi": "Chào bạn! 👋 Mình là chatbot giới thiệu về Vương Lộc Trường. Bạn muốn hỏi điều gì (quê quán, học vấn, sở thích, gia đình, triết lý sống, liên hệ…)?",
-        "en": "Hi there! 👋 I’m a chatbot about Vuong Loc Truong. What would you like to know (hometown, education, hobbies, family, life motto, contact…)?"
+        "vi": "Chào bạn! Mình là chatbot giới thiệu về Vương Lộc Trường. Bạn muốn hỏi điều gì (quê quán, học vấn, sở thích, gia đình, triết lý sống, liên hệ...)?",
+        "en": "Hi there! I'm a chatbot about Vuong Loc Truong. What would you like to know (hometown, education, hobbies, family, life motto, contact...)?"
       }
     },
     {
@@ -24,7 +23,7 @@
       },
       "answer": {
         "vi": "Rất vui được hỗ trợ bạn! Bạn còn muốn hỏi điều gì nữa không?",
-        "en": "Happy to help! Anything else you’d like to ask?"
+        "en": "Happy to help! Anything else you'd like to ask?"
       }
     },
     {
@@ -34,8 +33,8 @@
         "en": ["bye", "goodbye", "see you"]
       },
       "answer": {
-        "vi": "Tạm biệt! Chúc bạn một ngày tốt lành 👋",
-        "en": "Goodbye! Have a great day 👋"
+        "vi": "Tạm biệt! Chúc bạn một ngày tốt lành.",
+        "en": "Goodbye! Have a great day."
       }
     },
     {
@@ -46,18 +45,18 @@
       },
       "answer": {
         "vi": "Đây là một bí mật ^^",
-        "en": "That’s a secret ^^"
+        "en": "That's a secret ^^"
       }
     },
     {
       "name": "name",
       "keywords": {
         "vi": ["tên gì", "ten gi", "bạn là ai", "ban la ai", "họ tên", "ho ten", "tên của bạn", "ten cua ban", "tên đầy đủ", "ten day du", "giới thiệu bản thân"],
-        "en": ["introduce yourself", "your name", "what is your name", "who are you", "what is your full name", "your full name" ]
+        "en": ["introduce yourself", "your name", "what is your name", "who are you", "what is your full name", "your full name"]
       },
       "answer": {
         "vi": "Mình là Chatbot giới thiệu bản thân của Vương Lộc Trường.",
-        "en": "I’m the personal intro chatbot for Vuong Loc Truong."
+        "en": "I'm the personal intro chatbot for Vuong Loc Truong."
       }
     },
     {
@@ -101,7 +100,7 @@
       },
       "answer": {
         "vi": "Hiện Trường đang theo học tại AIT (Thái Lan); quê quán ở An Thới, Phú Quốc, Kiên Giang.",
-        "en": "I’m currently studying at AIT (Thailand); my hometown is An Thoi, Phu Quoc, Kien Giang."
+        "en": "I'm currently studying at AIT (Thailand); my hometown is An Thoi, Phu Quoc, Kien Giang."
       }
     },
     {
@@ -112,7 +111,7 @@
       },
       "answer": {
         "vi": "Trường khá hướng nội, thích không gian yên tĩnh để tập trung và suy ngẫm; nhưng bên trong là một tâm hồn hướng ngoại, vui vẻ và hoà đồng khi ở cạnh bạn bè thân.",
-        "en": "I’m quite introverted and enjoy quiet spaces to focus and reflect, but I’m also cheerful and sociable around close friends."
+        "en": "I'm quite introverted and enjoy quiet spaces to focus and reflect, but I'm also cheerful and sociable around close friends."
       }
     },
     {
@@ -134,7 +133,7 @@
       },
       "answer": {
         "vi": "Hiện Trường là học viên Thạc sĩ ngành Data Science & AI tại AIT (Asian Institute of Technology), Thái Lan.",
-        "en": "I’m pursuing a Master’s in Data Science & AI at the Asian Institute of Technology (AIT), Thailand."
+        "en": "I'm pursuing a Master's in Data Science & AI at the Asian Institute of Technology (AIT), Thailand."
       }
     },
     {
@@ -145,7 +144,7 @@
       },
       "answer": {
         "vi": "Ngoài giờ học, Trường đam mê game và chơi thể thao, đặc biệt là cầu lông.",
-        "en": "Outside of studying, I love gaming and sports—especially badminton."
+        "en": "Outside of studying, I love gaming and sports, especially badminton."
       }
     },
     {
@@ -156,7 +155,7 @@
       },
       "answer": {
         "vi": "Món ăn yêu thích của Trường là bánh cuốn và bột chiên.",
-        "en": "My favorite foods are bánh cuốn (steamed rice rolls) and bột chiên (fried rice flour cake)."
+        "en": "My favorite foods are banh cuon (steamed rice rolls) and bot chien (fried rice flour cake)."
       }
     },
     {
@@ -189,7 +188,7 @@
       },
       "answer": {
         "vi": "Triết lý sống của Trường là: 'Thêm một người bạn, bớt một kẻ thù'.",
-        "en": "My life motto is: “Gain one more friend, have one less enemy.”"
+        "en": "My life motto is: \"Gain one more friend, have one less enemy.\""
       }
     },
     {
@@ -200,7 +199,7 @@
       },
       "answer": {
         "vi": "Trường nói được tiếng Việt và tiếng Anh, nhưng không biết tiếng Thái mặc dù đang học ở Thái Lan.",
-        "en": "I speak Vietnamese and English, but I don’t speak Thai even though I’m studying in Thailand."
+        "en": "I speak Vietnamese and English, but I don't speak Thai even though I'm studying in Thailand."
       }
     },
     {
@@ -210,16 +209,15 @@
         "en": ["contact", "how to contact", "reach you", "email", "phone number"]
       },
       "answer": {
-        "vi": "Kết nối với Trường qua email: vuongloctruong95@gmail.com — Số điện thoại: +84 869 183 424.",
-        "en": "You can reach me at email: vuongloctruong95@gmail.com — Phone: +84 869 183 424."
+        "vi": "Kết nối với Trường qua email: vuongloctruong95@gmail.com - Số điện thoại: +84 869 183 424.",
+        "en": "You can reach me at email: vuongloctruong95@gmail.com - Phone: +84 869 183 424."
       }
     }
   ],
-
   "qa": [
     {
       "vi": { "q": "Bạn là ai?", "a": "Mình là Vương Lộc Trường, người An Thới (Phú Quốc, Kiên Giang), sinh năm 2001." },
-      "en": { "q": "Who are you?", "a": "I’m Vuong Loc Truong from An Thoi (Phu Quoc, Kien Giang), born in 2001." }
+      "en": { "q": "Who are you?", "a": "I'm Vuong Loc Truong from An Thoi (Phu Quoc, Kien Giang), born in 2001." }
     },
     {
       "vi": { "q": "Tên đầy đủ của bạn là gì?", "a": "Mình là Vương Lộc Trường." },
@@ -243,31 +241,31 @@
     },
     {
       "vi": { "q": "Bạn thích món ăn gì?", "a": "Mình thích bánh cuốn và bột chiên." },
-      "en": { "q": "What is your favorite food?", "a": "My favorite foods are bánh cuốn (steamed rice rolls) and bột chiên (fried rice flour cake)." }
+      "en": { "q": "What is your favorite food?", "a": "My favorite foods are banh cuon (steamed rice rolls) and bot chien (fried rice flour cake)." }
     },
     {
       "vi": { "q": "Triết lý sống của bạn là gì?", "a": "Mình tin rằng: 'Thêm một người bạn, bớt một kẻ thù'." },
-      "en": { "q": "What is your life motto?", "a": "“Gain one more friend, have one less enemy.”" }
+      "en": { "q": "What is your life motto?", "a": "\"Gain one more friend, have one less enemy.\"" }
     },
     {
       "vi": { "q": "Bạn nói được những ngôn ngữ nào?", "a": "Mình nói tiếng Việt và tiếng Anh, không biết tiếng Thái." },
-      "en": { "q": "What languages do you speak?", "a": "I speak Vietnamese and English, but I don’t speak Thai." }
+      "en": { "q": "What languages do you speak?", "a": "I speak Vietnamese and English, but I don't speak Thai." }
     },
     {
       "vi": { "q": "Bạn đang học ở đâu và ngành gì?", "a": "Mình đang học Thạc sĩ Data Science & AI tại AIT (Thái Lan). Trước đó học cử nhân IT tại Đại học Văn Lang (TP.HCM)." },
-      "en": { "q": "Where and what are you studying?", "a": "I’m studying a Master’s in Data Science & AI at AIT (Thailand). I previously did my IT bachelor’s at Van Lang University (HCMC)." }
+      "en": { "q": "Where and what are you studying?", "a": "I'm studying a Master's in Data Science & AI at AIT (Thailand). I previously did my IT bachelor's at Van Lang University (HCMC)." }
     },
     {
       "vi": { "q": "Bạn học trường gì?", "a": "Mình học cử nhân IT tại Đại học Văn Lang (TP.HCM), và hiện đang học Thạc sĩ Data Science & AI tại AIT (Thái Lan)." },
-      "en": { "q": "Which university did you attend?", "a": "I did my IT bachelor’s at Van Lang University (HCMC), and I’m now doing a Master’s in DS & AI at AIT (Thailand)." }
+      "en": { "q": "Which university did you attend?", "a": "I did my IT bachelor's at Van Lang University (HCMC), and I'm now doing a Master's in DS & AI at AIT (Thailand)." }
     },
     {
       "vi": { "q": "Bạn học ngành gì?", "a": "Mình học cử nhân Công nghệ Thông tin (IT) và đang học Thạc sĩ Data Science & AI." },
-      "en": { "q": "What’s your major?", "a": "I majored in Information Technology for my bachelor’s and I’m doing a Master’s in Data Science & AI." }
+      "en": { "q": "What's your major?", "a": "I majored in Information Technology for my bachelor's and I'm doing a Master's in Data Science & AI." }
     },
     {
       "vi": { "q": "Bạn có tính cách như thế nào?", "a": "Mình thiên hướng nội, thích yên tĩnh để tập trung; nhưng khi ở bên bạn bè thân thì rất vui vẻ, hoà đồng." },
-      "en": { "q": "What’s your personality like?", "a": "I’m quite introverted and enjoy quiet spaces, but I’m cheerful and sociable with close friends." }
+      "en": { "q": "What's your personality like?", "a": "I'm quite introverted and enjoy quiet spaces, but I'm cheerful and sociable with close friends." }
     },
     {
       "vi": { "q": "Bạn thích môn thể thao nào?", "a": "Mình thích cầu lông; ngoài ra còn chơi game để thư giãn và rèn phản xạ." },
@@ -279,15 +277,15 @@
     },
     {
       "vi": { "q": "Email của bạn là gì?", "a": "Email của mình là: vuongloctruong95@gmail.com." },
-      "en": { "q": "What’s your email?", "a": "My email is: vuongloctruong95@gmail.com." }
+      "en": { "q": "What's your email?", "a": "My email is: vuongloctruong95@gmail.com." }
     },
     {
       "vi": { "q": "Số điện thoại của bạn?", "a": "Số điện thoại của mình là: +84 869 183 424." },
-      "en": { "q": "What’s your phone number?", "a": "My phone number is: +84 869 183 424." }
+      "en": { "q": "What's your phone number?", "a": "My phone number is: +84 869 183 424." }
     },
     {
       "vi": { "q": "Bạn có bạn gái chưa?", "a": "Đây là một bí mật ^^" },
-      "en": { "q": "Do you have a girlfriend?", "a": "That’s a secret ^^" }
+      "en": { "q": "Do you have a girlfriend?", "a": "That's a secret ^^" }
     }
   ]
 }

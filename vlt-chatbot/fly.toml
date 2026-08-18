@@ -25,6 +25,7 @@ primary_region = "sin"
   memory_mb = 512
 
 [env]
+  PROFILE_PATH = "data/profile.json"
   KNOWLEDGE_DIR = "data/knowledge"
   EMBED_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
   TOP_K = "4"

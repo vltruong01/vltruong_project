@@ -13,10 +13,12 @@ from pydantic import BaseModel
 
 from chatbot.composer import GroundedComposer
 from chatbot.knowledge import KnowledgeChunk, load_knowledge
+from chatbot.legacy import LegacyProfileMatcher
 from chatbot.retriever import SemanticRetriever
 
 
 BASE_DIR = Path(__file__).resolve().parent
+PROFILE_PATH = Path(os.environ.get("PROFILE_PATH", BASE_DIR / "data" / "profile.json"))
 KNOWLEDGE_DIR = Path(os.environ.get("KNOWLEDGE_DIR", BASE_DIR / "data" / "knowledge"))
 MODEL_NAME = os.environ.get("EMBED_MODEL", "sentence-transformers/all-MiniLM-L6-v2")
 TOP_K = int(os.environ.get("TOP_K", "4"))
@@ -24,6 +26,7 @@ TOP_K = int(os.environ.get("TOP_K", "4"))
 chunks: List[KnowledgeChunk] = []
 retriever: SemanticRetriever | None = None
 composer = GroundedComposer()
+legacy_matcher = LegacyProfileMatcher(PROFILE_PATH)
 
 
 @asynccontextmanager
@@ -72,6 +75,15 @@ async def ask_api(body: AskBody):
 
 
 def get_answer(question: str, lang: str = "vi") -> dict:
+    legacy_answer = legacy_matcher.answer(question, lang)
+    if legacy_answer:
+        return {
+            "answer": legacy_answer.answer,
+            "confidence": legacy_answer.confidence,
+            "type": legacy_answer.type,
+            "sources": legacy_answer.sources,
+        }
+
     active_retriever = retriever
     if active_retriever is None:
         return {
@@ -82,6 +94,13 @@ def get_answer(question: str, lang: str = "vi") -> dict:
         }
     results = active_retriever.search(question, top_k=TOP_K)
     answer = composer.compose(question, results, lang=lang)
+    if answer.type == "unknown":
+        return {
+            "answer": legacy_matcher.fallback(lang),
+            "confidence": answer.confidence,
+            "type": answer.type,
+            "sources": answer.sources,
+        }
     return {
         "answer": answer.answer,
         "confidence": answer.confidence,
@@ -337,11 +356,23 @@ HTML_FORM = """
         subtitle: "Hỏi về học vấn, kỹ năng, dự án, nghiên cứu và liên hệ.",
         error: "Có lỗi kết nối. Bạn thử lại giúp mình nhé.",
         suggestions: [
-          "Bạn có thể làm gì?",
-          "Các dự án AI của bạn?",
-          "Bạn đang nghiên cứu gì?",
-          "Những công nghệ bạn sử dụng?",
-          "Thông tin liên hệ của bạn?"
+          "Bạn là ai?",
+          "Bạn tên đầy đủ là gì?",
+          "Bạn bao nhiêu tuổi?",
+          "Bạn sinh ra ở đâu?",
+          "Quê quán của bạn ở đâu?",
+          "Bạn học trường gì?",
+          "Bạn học ngành gì?",
+          "Bạn có tính cách thế nào?",
+          "Bạn thích môn thể thao nào?",
+          "Món ăn yêu thích của bạn?",
+          "Gia đình bạn có mấy người?",
+          "Triết lý sống của bạn là gì?",
+          "Bạn nói được những ngôn ngữ nào?",
+          "Bạn có bạn gái chưa?",
+          "Ước mơ nghề nghiệp của bạn?",
+          "Email của bạn?",
+          "Số điện thoại của bạn?"
         ]
       },
       en: {
@@ -352,11 +383,23 @@ HTML_FORM = """
         subtitle: "Ask about education, skills, projects, research, and contact.",
         error: "Connection error. Please try again.",
         suggestions: [
-          "What can you do?",
-          "Your AI projects?",
-          "What are you researching?",
-          "What technologies do you use?",
-          "How can I contact you?"
+          "Who are you?",
+          "What is your full name?",
+          "How old are you?",
+          "Where were you born?",
+          "Where is your hometown?",
+          "Which university did you study?",
+          "What was your major?",
+          "What is your personality like?",
+          "What sport do you like?",
+          "What is your favorite food?",
+          "How many people are in your family?",
+          "What is your life motto?",
+          "What languages do you speak?",
+          "Do you have a girlfriend?",
+          "What is your career goal?",
+          "What is your email?",
+          "What is your phone number?"
         ]
       }
     };

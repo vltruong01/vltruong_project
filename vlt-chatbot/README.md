@@ -8,6 +8,8 @@ This project does not use OpenAI API, Gemini API, Claude API, paid AI APIs, GPU,
 
 ```text
 Question
+-> Legacy FAQ exact match
+-> Legacy intent keyword match
 -> Query embedding
 -> Semantic retrieval
 -> Top-K markdown knowledge chunks
@@ -15,7 +17,7 @@ Question
 -> JSON response
 ```
 
-The chatbot is RAG-style, but it does not use an LLM. It retrieves relevant knowledge chunks and formats an answer only from the retrieved text.
+The chatbot keeps the original deterministic FAQ/intent answers first. If a question does not match the original profile rules, it falls back to the RAG-style markdown retrieval layer. It does not use an LLM.
 
 ## Code Structure
 
@@ -23,6 +25,7 @@ The chatbot is RAG-style, but it does not use an LLM. It retrieves relevant know
 app.py
 chatbot/
   knowledge.py   # load markdown documents and create chunks
+  legacy.py      # original FAQ and intent answers from profile.json
   retriever.py   # SentenceTransformer + cosine similarity
   composer.py    # non-LLM grounded answer composition
   utils.py       # normalization and small helpers
@@ -51,11 +54,12 @@ At startup:
 
 Per request:
 
-1. Encode the user question.
-2. Compute cosine similarity against cached chunk embeddings.
-3. Select Top-K chunks.
-4. Compose an answer from retrieved content.
-5. Return fallback if confidence is low.
+1. Try exact FAQ and intent matching from `data/profile.json`.
+2. If no legacy answer is found, encode the user question.
+3. Compute cosine similarity against cached chunk embeddings.
+4. Select Top-K chunks.
+5. Compose an answer from retrieved content.
+6. Return fallback if confidence is low.
 
 ## API
 
@@ -106,6 +110,8 @@ data/knowledge/contact.md
 ```
 
 Restart the app after editing so embeddings are rebuilt from the updated markdown files.
+
+To preserve or update fixed answers and suggestion-compatible FAQ content, edit `data/profile.json`.
 
 ## Run Local
 
