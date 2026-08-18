@@ -11,8 +11,8 @@
         "en": ["hello", "hi", "hey", "good morning", "good afternoon", "good evening", "morning", "yo", "sup"]
       },
       "answer": {
-        "vi": "Chào bạn! Mình là chatbot giới thiệu về Vương Lộc Trường. Bạn muốn hỏi điều gì (quê quán, học vấn, sở thích, gia đình, triết lý sống, liên hệ...)?",
-        "en": "Hi there! I'm a chatbot about Vuong Loc Truong. What would you like to know (hometown, education, hobbies, family, life motto, contact...)?"
+        "vi": "Chào bạn! 👋 Mình là chatbot giới thiệu về Vương Lộc Trường. Bạn muốn hỏi điều gì (quê quán, học vấn, sở thích, gia đình, triết lý sống, liên hệ...)?",
+        "en": "Hi there! 👋 I'm a chatbot about Vuong Loc Truong. What would you like to know (hometown, education, hobbies, family, life motto, contact...)?"
       }
     },
     {
@@ -106,12 +106,12 @@
     {
       "name": "personality",
       "keywords": {
-        "vi": ["tính cách", "tinh cach", "hướng nội", "huong noi", "hướng ngoại", "huong ngoai"],
-        "en": ["personality", "introvert", "extrovert"]
+        "vi": ["tính cách", "tinh cach", "hướng nội", "huong noi", "hướng ngoại", "huong ngoai", "dễ gần", "de gan", "dễ làm quen", "de lam quen", "ít nói", "it noi", "lầy lội", "lay loi", "lãng xẹt", "lang xet", "nhạt", "nhat"],
+        "en": ["personality", "introvert", "extrovert", "friendly", "easy to talk", "quiet", "funny", "silly", "dry humor"]
       },
       "answer": {
-        "vi": "Trường khá hướng nội, thích không gian yên tĩnh để tập trung và suy ngẫm; nhưng bên trong là một tâm hồn hướng ngoại, vui vẻ và hoà đồng khi ở cạnh bạn bè thân.",
-        "en": "I'm quite introverted and enjoy quiet spaces to focus and reflect, but I'm also cheerful and sociable around close friends."
+        "vi": "Trường là người dễ gần, dễ bắt chuyện và dễ làm quen. Lúc chưa thân thì hơi ít nói cho có vẻ bí ẩn, còn thân rồi thì lầy lội như bật nhầm chế độ party. Trường cũng tự nhận mình hơi lãng xẹt và nhạt, nên rất cần bạn bè mặn mòi để cân bằng hệ sinh thái.",
+        "en": "Truong is friendly, easy to talk to, and easy to get to know. At first he can be quiet, but once he gets close to someone, the silly mode is fully unlocked. He also admits his humor can be very dry, so he needs salty friends to keep life balanced."
       }
     },
     {
@@ -139,23 +139,67 @@
     {
       "name": "hobbies",
       "keywords": {
-        "vi": ["sở thích", "so thich", "thích gì", "thich gi", "giải trí", "giai tri", "ngoài giờ học", "ngoai gio hoc", "game", "gaming", "thể thao", "the thao", "cầu lông", "cau long", "chơi game", "choi game"],
-        "en": ["hobby", "hobbies", "games", "gaming", "sports", "badminton"]
+        "vi": ["sở thích", "so thich", "thích gì", "thich gi", "giải trí", "giai tri", "ngoài giờ học", "ngoai gio hoc", "game", "gaming", "thể thao", "the thao", "cầu lông", "cau long", "chơi game", "choi game", "roblox", "đánh bài", "danh bai"],
+        "en": ["hobby", "hobbies", "games", "gaming", "sports", "badminton", "roblox", "cards", "card game"]
       },
       "answer": {
-        "vi": "Ngoài giờ học, Trường đam mê game và chơi thể thao, đặc biệt là cầu lông.",
-        "en": "Outside of studying, I love gaming and sports, especially badminton."
+        "vi": "Ngoài giờ học, Trường thích chơi game nhiều thể loại, đặc biệt là Roblox khi có bạn bè chơi chung. Thể thao thì thích cầu lông. Còn ai rủ đánh bài thì Trường chơi tới bến, miễn là vui vẻ văn minh, không biến ví tiền thành đề tài nghiên cứu.",
+        "en": "Outside of studying, Truong enjoys many types of games, especially Roblox with friends. For sports, he likes badminton. If someone invites him to play cards, he is in for the fun, as long as everyone keeps it friendly."
       }
     },
     {
       "name": "favorites",
       "keywords": {
-        "vi": ["món ăn yêu thích", "mon an yeu thich", "thích ăn gì", "thich an gi", "món khoái khẩu", "mon khoai khau"],
-        "en": ["favorite food", "what food do you like"]
+        "vi": ["món ăn yêu thích", "mon an yeu thich", "thích ăn gì", "thich an gi", "món khoái khẩu", "mon khoai khau", "bánh cuốn nóng", "banh cuon nong", "màu yêu thích", "mau yeu thich", "màu gì", "mau gi", "nhạc", "nhac", "bài hát", "bai hat", "anime", "dragon ball", "7 viên ngọc rồng"],
+        "en": ["favorite food", "what food do you like", "favorite color", "color", "music", "song", "anime", "dragon ball"]
       },
       "answer": {
-        "vi": "Món ăn yêu thích của Trường là bánh cuốn và bột chiên.",
-        "en": "My favorite foods are banh cuon (steamed rice rolls) and bot chien (fried rice flour cake)."
+        "vi": "Gu yêu thích của Trường khá rõ: món mê nhất là bánh cuốn nóng, màu thích là đỏ và xanh lá, bài nhạc thích nhất là 'Ngày này năm ấy', còn anime chân ái là 7 viên ngọc rồng. Nói chung gu không quá cầu kỳ, nhưng đã thích là nhớ rất dai.",
+        "en": "Truong's favorites are pretty clear: hot banh cuon is his top food, red and green are his favorite colors, his favorite song is 'Ngay nay nam ay', and his favorite anime is Dragon Ball."
+      }
+    },
+    {
+      "name": "home_address",
+      "keywords": {
+        "vi": ["nhà ở đâu", "nha o dau", "nhà bạn ở đâu", "nha ban o dau", "địa chỉ nhà", "dia chi nha", "cảng an thới", "cang an thoi"],
+        "en": ["where is your house", "where do you live", "home address", "An Thoi Port"]
+      },
+      "answer": {
+        "vi": "Nhà Trường ở Cảng An Thới, Phú Quốc. Nói ngắn gọn là gần biển, gần gió, và đủ xa để mỗi lần ai hỏi đường là có thể mở luôn chuyên mục hướng dẫn viên bất đắc dĩ.",
+        "en": "Truong's home is at An Thoi Port, Phu Quoc. Short version: close to the sea, close to the wind, and scenic enough to accidentally become a tour guide when someone asks for directions."
+      }
+    },
+    {
+      "name": "travel_homebody",
+      "keywords": {
+        "vi": ["du lịch", "du lich", "đi chơi", "di choi", "ở nhà", "o nha", "nằm ở nhà", "nam o nha", "thích đi đâu", "thich di dau"],
+        "en": ["travel", "go out", "hang out", "stay home", "homebody"]
+      },
+      "answer": {
+        "vi": "Trường thích nằm ở nhà hơn là đi du lịch hay đi chơi. Với Trường, chiếc giường đôi khi hấp dẫn hơn mọi thắng cảnh, kiểu nghỉ dưỡng 5 sao nhưng phiên bản không cần ra khỏi cửa.",
+        "en": "Truong prefers staying home over traveling or going out. To him, the bed can beat any tourist attraction: five-star relaxation, zero walking required."
+      }
+    },
+    {
+      "name": "fashion_style",
+      "keywords": {
+        "vi": ["gu ăn mặc", "gu an mac", "phong cách ăn mặc", "phong cach an mac", "mặc đồ", "mac do", "nhà quê", "nha que"],
+        "en": ["fashion", "style", "outfit", "clothes", "dress"]
+      },
+      "answer": {
+        "vi": "Trường không có gu ăn mặc rõ ràng. Phong cách có thể mô tả thân thương là 'nhà quê edition': đơn giản, dễ mặc, không làm ai chói mắt, và cũng không làm stylist nào mất ngủ vì phải phân tích.",
+        "en": "Truong does not really have a fashion style. The most honest description is 'countryside edition': simple, comfortable, and not trying too hard."
+      }
+    },
+    {
+      "name": "favorite_quote",
+      "keywords": {
+        "vi": ["câu nói tâm đắc", "cau noi tam dac", "câu nói yêu thích", "cau noi yeu thich", "học tài thi tạch", "hoc tai thi tach"],
+        "en": ["favorite quote", "quote", "motto", "hoc tai thi tach"]
+      },
+      "answer": {
+        "vi": "Câu nói Trường tâm đắc là: 'Học tài thi tạch'. Nghe hơi đau nhưng rất đời: chuẩn bị kỹ vẫn có thể trượt, nên cứ cố gắng hết mình rồi cười nhẹ cho đỡ quê.",
+        "en": "Truong's favorite quote is: 'Hoc tai thi tach' - roughly, even talented study can still fail an exam. Painful, but very real."
       }
     },
     {
@@ -286,6 +330,50 @@
     {
       "vi": { "q": "Bạn có bạn gái chưa?", "a": "Đây là một bí mật ^^" },
       "en": { "q": "Do you have a girlfriend?", "a": "That's a secret ^^" }
+    },
+    {
+      "vi": { "q": "Bạn là người như thế nào?", "a": "Mình là người dễ gần, dễ bắt chuyện và dễ làm quen. Chưa thân thì hơi ít nói, thân rồi thì lầy lội không kịp phanh. Mình cũng khá lãng xẹt và nhạt, nên rất cần bạn bè mặn mòi để cân bằng." },
+      "en": { "q": "What kind of person are you?", "a": "I'm friendly and easy to talk to. I can be quiet at first, but once we are close, silly mode is unlocked. My humor can be dry, so I need salty friends for balance." }
+    },
+    {
+      "vi": { "q": "Bạn hay chơi game gì?", "a": "Mình chơi nhiều thể loại game, nhưng thích Roblox nhất khi được chơi cùng bạn bè. Game một mình cũng vui, nhưng có hội bạn thì độ vui tăng như được buff." },
+      "en": { "q": "What games do you play?", "a": "I play many types of games, but I especially like Roblox with friends. Playing alone is fun, but playing with friends feels like a happiness buff." }
+    },
+    {
+      "vi": { "q": "Bạn thích bài hát nào nhất?", "a": "Bài hát mình thích nhất là 'Ngày này năm ấy'. Nghe vào là mood tự động chuyển sang chế độ suy tư nhẹ." },
+      "en": { "q": "What is your favorite song?", "a": "My favorite song is 'Ngay nay nam ay'. It instantly switches my mood into gentle nostalgia mode." }
+    },
+    {
+      "vi": { "q": "Bạn thích anime nào nhất?", "a": "Anime mình thích nhất là 7 viên ngọc rồng. Tuổi thơ có Goku là tuổi thơ có năng lượng, thiếu điều chưa tự biến Super Saiyan được thôi." },
+      "en": { "q": "What is your favorite anime?", "a": "My favorite anime is Dragon Ball. Childhood with Goku just hits different, even if I still have not unlocked Super Saiyan mode." }
+    },
+    {
+      "vi": { "q": "Món ăn thích nhất của bạn là gì?", "a": "Món mình thích nhất là bánh cuốn nóng. Nóng hổi, mềm mềm, ăn vào là thấy cuộc đời bớt căng thẳng hẳn." },
+      "en": { "q": "What is your most favorite food?", "a": "My top favorite food is hot banh cuon. Warm, soft, comforting, and dangerously good." }
+    },
+    {
+      "vi": { "q": "Bạn có thích đi du lịch không?", "a": "Mình không thích đi du lịch hay đi chơi lắm, mình thích nằm ở nhà hơn. Với mình, ở nhà là khu nghỉ dưỡng miễn phí, không cần check-in, không cần kéo vali." },
+      "en": { "q": "Do you like traveling?", "a": "I don't really like traveling or going out. I prefer staying home. Home is basically a free resort: no check-in, no suitcase, no problem." }
+    },
+    {
+      "vi": { "q": "Nhà bạn ở đâu?", "a": "Nhà mình ở Cảng An Thới, Phú Quốc. Vừa nghe tên đã thấy có mùi biển, mùi gió, và mùi người dân địa phương bị hỏi đường." },
+      "en": { "q": "Where is your house?", "a": "My home is at An Thoi Port, Phu Quoc. The name already smells like sea breeze and accidental tour guiding." }
+    },
+    {
+      "vi": { "q": "Bạn thích màu gì?", "a": "Mình thích màu đỏ và xanh lá. Một màu cháy hết mình, một màu chữa lành nhẹ, phối lại nghe hơi Noel nhưng mình thích là được." },
+      "en": { "q": "What colors do you like?", "a": "I like red and green. One feels bold, one feels fresh. Together they may look a bit festive, but I like them anyway." }
+    },
+    {
+      "vi": { "q": "Gu ăn mặc của bạn là gì?", "a": "Mình không có gu ăn mặc rõ ràng. Phong cách của mình là nhà quê edition: đơn giản, thoải mái, mặc được là thắng." },
+      "en": { "q": "What is your fashion style?", "a": "I don't really have a fashion style. My style is countryside edition: simple, comfortable, and if it works, it wins." }
+    },
+    {
+      "vi": { "q": "Câu nói tâm đắc của bạn là gì?", "a": "Câu mình tâm đắc nhất là 'Học tài thi tạch'. Nghe buồn cười nhưng rất thật: đời đôi khi kiểm tra mình bằng đề ngoài giáo trình." },
+      "en": { "q": "What is your favorite quote?", "a": "My favorite quote is 'Hoc tai thi tach'. It is funny but real: sometimes life gives you an exam outside the syllabus." }
+    },
+    {
+      "vi": { "q": "Bạn có thích đánh bài không?", "a": "Ai rủ đánh bài thì mình chơi tới bến. Tinh thần là vui vẻ, giải trí, và giữ tình bạn nguyên vẹn sau ván cuối." },
+      "en": { "q": "Do you like playing cards?", "a": "If someone invites me to play cards, I'm in. The goal is fun, entertainment, and keeping the friendship alive after the last round." }
     }
   ]
 }

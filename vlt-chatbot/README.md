@@ -40,6 +40,8 @@ data/
     experience.md
     contact.md
     certifications.md
+    lifestyle.md
+    favorites.md
 ```
 
 ## Retrieval Pipeline
@@ -112,6 +114,8 @@ data/knowledge/contact.md
 Restart the app after editing so embeddings are rebuilt from the updated markdown files.
 
 To preserve or update fixed answers and suggestion-compatible FAQ content, edit `data/profile.json`.
+
+For lifestyle/personality details, edit `data/knowledge/lifestyle.md` and `data/knowledge/favorites.md`.
 
 ## Run Local
 

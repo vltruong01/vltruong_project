@@ -319,7 +319,7 @@ HTML_FORM = """
         <img src="/static/cutechatbot.png?v=4" alt="">
         <div>
           <div class="title" id="title">VLT Knowledge Chatbot</div>
-          <div class="subtitle" id="subtitle">Hỏi về học vấn, kỹ năng, dự án, nghiên cứu và liên hệ.</div>
+          <div class="subtitle" id="subtitle">Hỏi về tính cách, sở thích, quê nhà, học vấn và liên hệ.</div>
         </div>
       </div>
       <div class="lang" aria-label="Language">
@@ -349,11 +349,11 @@ HTML_FORM = """
 
     const copy = {
       vi: {
-        hello: "Chào bạn! Mình trả lời dựa trên knowledge base markdown của Vương Lộc Trường. Bạn muốn hỏi gì?",
+        hello: "Chào bạn! Mình là chatbot giới thiệu về Vương Lộc Trường. Bạn muốn hỏi điều gì? 😊\nĐây là toàn bộ infor của mình bạn có thể click vào nhé: https://vlt-infor.fly.dev/",
         placeholder: "Nhập câu hỏi...",
         send: "Gửi",
         title: "VLT Knowledge Chatbot",
-        subtitle: "Hỏi về học vấn, kỹ năng, dự án, nghiên cứu và liên hệ.",
+        subtitle: "Hỏi về tính cách, sở thích, quê nhà, học vấn và liên hệ.",
         error: "Có lỗi kết nối. Bạn thử lại giúp mình nhé.",
         suggestions: [
           "Bạn là ai?",
@@ -372,15 +372,24 @@ HTML_FORM = """
           "Bạn có bạn gái chưa?",
           "Ước mơ nghề nghiệp của bạn?",
           "Email của bạn?",
-          "Số điện thoại của bạn?"
+          "Số điện thoại của bạn?",
+          "Bạn là người như thế nào?",
+          "Bạn hay chơi game gì?",
+          "Bạn thích bài hát nào nhất?",
+          "Bạn thích anime nào nhất?",
+          "Nhà bạn ở đâu?",
+          "Bạn có thích đi du lịch không?",
+          "Bạn thích màu gì?",
+          "Gu ăn mặc của bạn là gì?",
+          "Câu nói tâm đắc của bạn là gì?"
         ]
       },
       en: {
-        hello: "Hi! I answer from Vuong Loc Truong's local markdown knowledge base. What would you like to know?",
+        hello: "Hi there! I'm a chatbot about Vuong Loc Truong. What would you like to know? You can also visit: https://vlt-infor.fly.dev/",
         placeholder: "Type a question...",
         send: "Send",
         title: "VLT Knowledge Chatbot",
-        subtitle: "Ask about education, skills, projects, research, and contact.",
+        subtitle: "Ask about personality, hobbies, hometown, education, and contact.",
         error: "Connection error. Please try again.",
         suggestions: [
           "Who are you?",
@@ -399,7 +408,16 @@ HTML_FORM = """
           "Do you have a girlfriend?",
           "What is your career goal?",
           "What is your email?",
-          "What is your phone number?"
+          "What is your phone number?",
+          "What kind of person are you?",
+          "What games do you play?",
+          "What is your favorite song?",
+          "What is your favorite anime?",
+          "Where is your house?",
+          "Do you like traveling?",
+          "What colors do you like?",
+          "What is your fashion style?",
+          "What is your favorite quote?"
         ]
       }
     };
@@ -487,9 +505,11 @@ HTML_FORM = """
         });
         const data = await response.json();
         const sourceText = (data.sources || []).map((s) => s.title).join(", ");
+        const scoreLabel = lang === "vi" ? "độ chắc chắn" : "certainty";
+        const sourceLabel = lang === "vi" ? "nguồn" : "sources";
         const meta = data.type === "semantic"
-          ? `confidence ${Number(data.confidence || 0).toFixed(2)}${sourceText ? " | sources: " + sourceText : ""}`
-          : `confidence ${Number(data.confidence || 0).toFixed(2)}`;
+          ? `${scoreLabel} ${Number(data.confidence || 0).toFixed(2)}${sourceText ? " | " + sourceLabel + ": " + sourceText : ""}`
+          : `${scoreLabel} ${Number(data.confidence || 0).toFixed(2)}`;
         hideTyping();
         addMessage(data.answer || copy[lang].error, "bot", meta);
       } catch (error) {
