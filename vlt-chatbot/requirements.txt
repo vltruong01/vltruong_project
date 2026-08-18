@@ -1,10 +1,8 @@
 fastapi==0.115.0
-uvicorn==0.30.6          # bỏ [standard] để không kéo thêm websockets/watchfiles...
-python-multipart==0.0.9
+uvicorn==0.30.6
 
 numpy==2.1.1
-scikit-learn==1.5.1
 
-# sentence-transformers cần torch, nhưng ta dùng bản CPU-only
+# CPU-only semantic retrieval.
 sentence-transformers==3.0.1
-torch==2.3.1+cpu         # sẽ cài qua extra index của PyTorch (xem Dockerfile)
+torch==2.3.1+cpu

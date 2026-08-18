@@ -1,178 +1,104 @@
-from fastapi import FastAPI, Form
+from __future__ import annotations
+
+import os
+from contextlib import asynccontextmanager
+from pathlib import Path
+from typing import List
+
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
-from typing import Dict, List, Tuple
-import json, os, re, unicodedata
-from fastapi.middleware.cors import CORSMiddleware
 
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
-from sentence_transformers import SentenceTransformer, util
+from chatbot.composer import GroundedComposer
+from chatbot.knowledge import KnowledgeChunk, load_knowledge
+from chatbot.retriever import SemanticRetriever
 
-# ---------- Load profile & Q&A ----------
-DATA_PATH = os.environ.get("PROFILE_PATH", "data/profile.json")
-with open(DATA_PATH, "r", encoding="utf-8") as f:
-    PROFILE = json.load(f)
 
-INTENTS: Dict[str, Dict] = {intent["name"]: intent for intent in PROFILE.get("intents", [])}
+BASE_DIR = Path(__file__).resolve().parent
+KNOWLEDGE_DIR = Path(os.environ.get("KNOWLEDGE_DIR", BASE_DIR / "data" / "knowledge"))
+MODEL_NAME = os.environ.get("EMBED_MODEL", "sentence-transformers/all-MiniLM-L6-v2")
+TOP_K = int(os.environ.get("TOP_K", "4"))
 
-# chỉ lấy những item có đủ "q" và "a"
-QA_ALL: List[Tuple[str, str]] = []
-for item in PROFILE.get("qa", []):
-    if "vi" in item and "q" in item["vi"] and "a" in item["vi"]:
-        QA_ALL.append((item["vi"]["q"], item["vi"]["a"]))
-    if "en" in item and "q" in item["en"] and "a" in item["en"]:
-        QA_ALL.append((item["en"]["q"], item["en"]["a"]))
+chunks: List[KnowledgeChunk] = []
+retriever: SemanticRetriever | None = None
+composer = GroundedComposer()
 
-FALLBACK_VI = PROFILE.get("fallback", {}).get("vi", "Xin lỗi, mình chưa rõ câu hỏi. Bạn có thể hỏi cụ thể hơn không?")
-FALLBACK_EN = PROFILE.get("fallback", {}).get("en", "Sorry, I'm not sure I understood. Could you ask more specifically?")
 
-# ---------- Helpers ----------
-def strip_diacritics(s: str) -> str:
-    nfkd = unicodedata.normalize("NFKD", s)
-    return "".join(c for c in nfkd if not unicodedata.combining(c))
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    global chunks, retriever
+    chunks = load_knowledge(KNOWLEDGE_DIR)
+    retriever = SemanticRetriever(chunks, model_name=MODEL_NAME)
+    yield
 
-def normalize(text: str) -> str:
-    t = strip_diacritics(text.lower().strip())
-    t = re.sub(r"\s+", " ", t)
-    return t
 
-def is_english(s: str) -> bool:
-    try:
-        s.encode("ascii")
-        return True
-    except Exception:
-        return False
+app = FastAPI(title="Personal RAG Chatbot", version="1.0.0-cpu-rag", lifespan=lifespan)
 
-# Split QA by language
-QA_VI: List[Tuple[str, str]] = []
-QA_EN: List[Tuple[str, str]] = []
-for q, a in QA_ALL:
-    if is_english(q):
-        QA_EN.append((q, a))
-    else:
-        QA_VI.append((q, a))
-
-# ---------- Intent patterns ----------
-INTENT_PATTERNS = {}
-for intent_name, intent in INTENTS.items():
-    pats = []
-    for lang in ["vi", "en"]:
-        if lang in intent.get("keywords", {}):
-            for kw in intent["keywords"][lang]:
-                nk = normalize(kw)
-                if not nk:
-                    continue
-                if len(nk) <= 2 or " " not in nk:
-                    pats.append(re.compile(rf"(?:^|\W){re.escape(nk)}(?:$|\W)"))
-                else:
-                    pats.append(f" {nk} ")
-    INTENT_PATTERNS[intent_name] = pats
-
-def match_intent(question: str) -> str:
-    q = " " + normalize(question) + " "
-    for intent_name, pats in INTENT_PATTERNS.items():
-        for pat in pats:
-            if isinstance(pat, str):
-                if pat in q:
-                    return intent_name
-            else:
-                if pat.search(q):
-                    return intent_name
-    return ""
-
-def answer_for_intent(intent_name: str, lang: str) -> str:
-    if not intent_name:
-        return ""
-    intent = INTENTS.get(intent_name, {})
-    if lang == "en":
-        return intent.get("answer", {}).get("en", "") or intent.get("answer", "")
-    return intent.get("answer", {}).get("vi", "") or intent.get("answer", "")
-
-# ---------- Semantic indexes ----------
-VECTORIZER_VI = TfidfVectorizer(ngram_range=(1, 2), lowercase=True) if QA_VI else None
-VECTORIZER_EN = TfidfVectorizer(ngram_range=(1, 2), lowercase=True) if QA_EN else None
-
-MATRIX_VI = VECTORIZER_VI.fit_transform([q for q, _ in QA_VI]) if QA_VI and VECTORIZER_VI else None
-MATRIX_EN = VECTORIZER_EN.fit_transform([q for q, _ in QA_EN]) if QA_EN and VECTORIZER_EN else None
-
-EMBED_MODEL = None
-QA_EMBEDS_VI = None
-QA_EMBEDS_EN = None
-
-def ensure_embed_model():
-    global EMBED_MODEL, QA_EMBEDS_VI, QA_EMBEDS_EN
-    if EMBED_MODEL is None:
-        EMBED_MODEL = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
-        if QA_VI:
-            QA_EMBEDS_VI = EMBED_MODEL.encode([q for q, _ in QA_VI], convert_to_tensor=True)
-        if QA_EN:
-            QA_EMBEDS_EN = EMBED_MODEL.encode([q for q, _ in QA_EN], convert_to_tensor=True)
-
-def embedding_match(question: str, lang: str, threshold: float = 0.55) -> str:
-    ensure_embed_model()
-    if lang == "vi" and QA_VI and QA_EMBEDS_VI is not None:
-        q_emb = EMBED_MODEL.encode([question], convert_to_tensor=True)
-        sims = util.cos_sim(q_emb, QA_EMBEDS_VI)[0]
-        best_idx = int(sims.argmax())
-        if float(sims[best_idx]) >= threshold:
-            return QA_VI[best_idx][1]
-    if lang == "en" and QA_EN and QA_EMBEDS_EN is not None:
-        q_emb = EMBED_MODEL.encode([question], convert_to_tensor=True)
-        sims = util.cos_sim(q_emb, QA_EMBEDS_EN)[0]
-        best_idx = int(sims.argmax())
-        if float(sims[best_idx]) >= threshold:
-            return QA_EN[best_idx][1]
-    return ""
-
-def semantic_match(question: str, lang: str, threshold: float = 0.35) -> str:
-    if lang == "vi" and QA_VI and MATRIX_VI is not None and VECTORIZER_VI:
-        try:
-            sims = cosine_similarity(VECTORIZER_VI.transform([question]), MATRIX_VI)[0]
-            best_idx = sims.argmax()
-            if sims[best_idx] >= threshold:
-                return QA_VI[best_idx][1]
-        except:
-            pass
-    if lang == "en" and QA_EN and MATRIX_EN is not None and VECTORIZER_EN:
-        try:
-            sims = cosine_similarity(VECTORIZER_EN.transform([question]), MATRIX_EN)[0]
-            best_idx = sims.argmax()
-            if sims[best_idx] >= threshold:
-                return QA_EN[best_idx][1]
-        except:
-            pass
-    return ""
-
-def fallback(lang: str) -> str:
-    return FALLBACK_EN if lang == "en" else FALLBACK_VI
-
-# ---------- FastAPI app ----------
-app = FastAPI(title="Personal Chatbot", version="0.5.0-no-auto-translate")
-
-# 👇 Bật CORS
-origins = [
-    "https://vlt-infor.fly.dev",   # cho phép frontend infor gọi API
-    "http://localhost:8000",       # khi dev local
-]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,      # domain được phép
+    allow_origins=[
+        "https://vlt-infor.fly.dev",
+        "http://localhost:8000",
+        "http://127.0.0.1:8000",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-@app.get("/health")
-def _health():
-    return {"status": "ok"}
+app.mount("/static", StaticFiles(directory=str(BASE_DIR / "static")), name="static")
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
 
 class AskBody(BaseModel):
     question: str
     lang: str = "vi"
+
+
+@app.get("/health")
+def health():
+    return {"status": "ok", "knowledge_chunks": len(chunks), "model": MODEL_NAME}
+
+
+@app.get("/", response_class=HTMLResponse)
+async def home():
+    return HTML_FORM
+
+
+@app.post("/ask")
+async def ask_api(body: AskBody):
+    return JSONResponse(get_answer(body.question, body.lang))
+
+
+def get_answer(question: str, lang: str = "vi") -> dict:
+    active_retriever = retriever
+    if active_retriever is None:
+        return {
+            "answer": "Knowledge index is still starting. Please try again in a moment.",
+            "confidence": 0.0,
+            "type": "startup",
+            "sources": [],
+        }
+    results = active_retriever.search(question, top_k=TOP_K)
+    answer = composer.compose(question, results, lang=lang)
+    return {
+        "answer": answer.answer,
+        "confidence": answer.confidence,
+        "type": answer.type,
+        "sources": answer.sources,
+    }
+
+
+@app.middleware("http")
+async def cache_headers(request, call_next):
+    response = await call_next(request)
+    if request.url.path == "/":
+        response.headers["Cache-Control"] = "no-store"
+    elif request.url.path.startswith("/static/"):
+        response.headers.setdefault("Cache-Control", "public, max-age=300, s-maxage=300")
+    return response
+
 
 HTML_FORM = """
 <!doctype html>
@@ -180,349 +106,373 @@ HTML_FORM = """
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Chatbot của VLTrường</title>
-  <link rel="icon" href="/static/cutechatbot.png?v=3">
+  <title>VLT RAG Chatbot</title>
+  <link rel="icon" href="/static/cutechatbot.png?v=4">
   <style>
-  :root{
-    --bg:#0b1220; --panel:#121a2b; --text:#eaf0ff; --muted:#95a1c6; --accent:#4c7fff;
-    --bubble-user:#3558ff; --bubble-bot:#1a2438; --border:#26314a;
-    --toggle-bg: #2d3748;
-    --toggle-checked-bg: var(--accent);
-    --toggle-handle: white;
-    --toggle-border: var(--border);
-  }
-  body{margin:0; background:var(--bg); color:var(--text); font-family:system-ui,Arial; height:100vh; display:flex; flex-direction:column;}
-  header{padding:14px 18px; border-bottom:1px solid var(--border); background:var(--panel); display:flex; justify-content:space-between; align-items:center;}
-  header .title{ font-weight:700; }
-  header .subtitle{ color:var(--muted); font-size:13px; }
-
-  /* ==== màu link trong chat ==== */
-  .bubble a {
-    color: #4ade80;          /* xanh lá sáng */
-    font-weight: 600;
-    text-decoration: underline;
-  }
-  .bubble a:visited {
-    color: #a78bfa;          /* tím lilac nhạt */
-  }
-  .bubble a:hover {
-    color: #f87171;          /* đỏ nhạt khi hover */
-  }
-  .bubble a:active {
-    color: #ef4444;          /* đỏ đậm khi click */
-  }
-  /* ============================= */
-
-  .lang-switch {display: flex; align-items: center; gap: 12px;}
-  .lang-label {font-size: 14px; color: var(--muted); font-weight: 500;}
-  .toggle-container {position: relative; display: inline-block; width: 70px; height: 30px; background: var(--toggle-bg); border: 1px solid var(--toggle-border); border-radius: 25px; cursor: pointer; overflow: hidden;}
-  .toggle-option {position: absolute; top: 0; width: 50%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; z-index: 2; transition: color 0.3s ease;}
-  .toggle-option.vn {left: 0; color: var(--text);}
-  .toggle-option.en {right: 0; color: var(--muted);}
-  .toggle-slider {position: absolute; top: 2px; left: 2px; width: 33px; height: 26px; background: var(--toggle-checked-bg); border-radius: 20px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1;}
-  .toggle-container.english .toggle-slider {left: calc(100% - 35px);}
-  .toggle-container.english .toggle-option.vn {color: var(--muted);}
-  .toggle-container.english .toggle-option.en {color: var(--text);}
-  .toggle-container:hover {border-color: var(--accent);}
-  .toggle-checkbox {position: absolute; opacity: 0; width: 0; height: 0;}
-
-  .container{flex:1; display:flex; justify-content:center; align-items:stretch; padding:12px;}
-  .chat{width:min(900px,100%); display:flex; flex-direction:column; border:1px solid var(--border); border-radius:16px; overflow:hidden; background:var(--panel);}
-  .messages{flex:1; padding:16px; overflow-y:auto; scroll-behavior:smooth; display:flex; flex-direction:column; gap:12px; max-height:450px;}
-  .bubble{max-width:75%; padding:12px 14px; border-radius:14px; line-height:1.45; white-space:pre-wrap; box-shadow:0 3px 10px rgba(0,0,0,.15);}
-  .row{ display:flex; gap:10px; align-items:flex-end; }
-  .row.user{ justify-content:flex-end; }
-  .row.user .bubble{ background:var(--bubble-user); }
-  .row.bot  .bubble{ background:var(--bubble-bot); border:1px solid var(--border); }
-  .avatar{width:32px; height:32px; border-radius:50%; overflow:hidden; flex:0 0 auto; border:1px solid var(--border); background:#243152;}
-  .avatar img{ width:100%; height:100%; object-fit:cover; display:block; }
-  .composer{border-top:1px solid var(--border); padding:12px; background:var(--panel); display:flex; gap:10px;}
-  textarea{flex:1; resize:none; background:#0e1526; color:var(--text); border:1px solid var(--border); border-radius:12px; padding:12px 14px; min-height:48px; outline:none;}
-  button{background:var(--accent); color:white; border:none; border-radius:12px; padding:12px 16px; font-weight:600; cursor:pointer;}
-  .footer-note {color: var(--muted); font-size: 12px; padding: 4px 12px; border-top: 1px dashed var(--border); display: flex; justify-content: center; align-items: center;}
-  .suggest-wrap {display: flex; gap: 6px; align-items: center; margin: 17px;}
-  select {background:#0e1526; color:#cfe0ff; border:1px solid var(--border); border-radius:8px; padding:4px 8px; font-size:12px; max-width:100%;}
+    :root {
+      color-scheme: light dark;
+      --bg: #f6f7fb;
+      --panel: #ffffff;
+      --panel-soft: #f0f3f8;
+      --text: #172033;
+      --muted: #667085;
+      --border: #d9deea;
+      --accent: #0f766e;
+      --user: #0f766e;
+      --bot: #eef3f2;
+      --shadow: 0 20px 55px rgba(20, 35, 60, .14);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #10131a;
+        --panel: #171b24;
+        --panel-soft: #202633;
+        --text: #edf2f7;
+        --muted: #a6adbb;
+        --border: #303847;
+        --accent: #2dd4bf;
+        --user: #0f766e;
+        --bot: #202833;
+        --shadow: 0 20px 55px rgba(0, 0, 0, .32);
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+    }
+    .shell {
+      width: min(980px, 100%);
+      height: min(760px, calc(100vh - 36px));
+      min-height: 560px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      display: grid;
+      grid-template-rows: auto 1fr auto auto;
+      overflow: hidden;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--border);
+    }
+    .brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .brand img { width: 42px; height: 42px; border-radius: 50%; border: 1px solid var(--border); }
+    .title { font-weight: 750; line-height: 1.2; }
+    .subtitle { color: var(--muted); font-size: 13px; margin-top: 3px; }
+    .lang {
+      display: inline-flex;
+      background: var(--panel-soft);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 3px;
+      flex: 0 0 auto;
+    }
+    .lang button {
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      min-width: 42px;
+      min-height: 32px;
+      border-radius: 999px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .lang button.active { background: var(--accent); color: white; }
+    .messages {
+      overflow-y: auto;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      scroll-behavior: smooth;
+    }
+    .row { display: flex; gap: 10px; align-items: flex-end; }
+    .row.user { justify-content: flex-end; }
+    .avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      background: var(--panel-soft);
+      flex: 0 0 auto;
+    }
+    .avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .bubble {
+      width: fit-content;
+      max-width: min(76%, 680px);
+      padding: 12px 14px;
+      border-radius: 14px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+    .row.user .bubble { background: var(--user); color: white; border-bottom-right-radius: 5px; }
+    .row.bot .bubble { background: var(--bot); border: 1px solid var(--border); border-bottom-left-radius: 5px; }
+    .meta { color: var(--muted); font-size: 12px; margin-top: 8px; }
+    .chips {
+      display: flex;
+      gap: 8px;
+      padding: 12px 18px;
+      border-top: 1px solid var(--border);
+      overflow-x: auto;
+    }
+    .chip {
+      border: 1px solid var(--border);
+      background: var(--panel-soft);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 9px 12px;
+      white-space: nowrap;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 13px;
+    }
+    .composer {
+      display: flex;
+      gap: 10px;
+      padding: 14px 18px 18px;
+      border-top: 1px solid var(--border);
+    }
+    textarea {
+      flex: 1;
+      min-height: 48px;
+      max-height: 140px;
+      resize: none;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      background: var(--panel-soft);
+      color: var(--text);
+      outline: none;
+      font: inherit;
+    }
+    textarea:focus { border-color: var(--accent); }
+    .send {
+      border: 0;
+      border-radius: 12px;
+      min-width: 92px;
+      padding: 0 16px;
+      background: var(--accent);
+      color: white;
+      font-weight: 750;
+      cursor: pointer;
+    }
+    .send:disabled { opacity: .65; cursor: wait; }
+    .typing { display: inline-flex; gap: 4px; align-items: center; min-width: 48px; }
+    .typing span {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--muted);
+      animation: pulse 1s infinite ease-in-out;
+    }
+    .typing span:nth-child(2) { animation-delay: .15s; }
+    .typing span:nth-child(3) { animation-delay: .3s; }
+    @keyframes pulse { 0%, 80%, 100% { opacity: .35; transform: translateY(0); } 40% { opacity: 1; transform: translateY(-3px); } }
+    @media (max-width: 640px) {
+      body { padding: 0; }
+      .shell { height: 100vh; min-height: 100vh; border-radius: 0; border-left: 0; border-right: 0; }
+      header { align-items: flex-start; }
+      .subtitle { display: none; }
+      .bubble { max-width: 86%; }
+      .composer { padding: 12px; }
+      .send { min-width: 72px; }
+    }
   </style>
 </head>
 <body>
-  <header>
-    <div>
-      <div id="headerTitle" class="title">🤖Đây là Chatbot của Vương Lộc Trường :3</div>
-      <div id="headerSubtitle" class="subtitle">Bạn có thể hỏi về: quê quán, học vấn, sở thích, liên hệ…</div>
-    </div>
-    <div class="lang-switch">
-      <span class="lang-label">Language:</span>
-      <label class="toggle-container" id="toggleContainer">
-        <input type="checkbox" class="toggle-checkbox" id="langToggle">
-        <div class="toggle-slider"></div>
-        <div class="toggle-option vn">VN</div>
-        <div class="toggle-option en">EN</div>
-      </label>
-    </div>
-  </header>
-
-  <div class="container">
-    <div class="chat">
-      <div id="messages" class="messages">
-        <div class="row bot">
-          <div class="avatar"><img src="/static/cutechatbot.png?v=3" alt="bot"></div>
-          <div class="bubble">Chào bạn! Mình là chatbot giới thiệu về Vương Lộc Trường. Bạn muốn hỏi điều gì? 😊<br>Đây là toàn bộ infor của mình bạn có thể click vào nhé <a href="https://vlt-infor.fly.dev/" target="_blank" rel="noopener">vlt-infor.fly.dev</a></div>
+  <main class="shell">
+    <header>
+      <div class="brand">
+        <img src="/static/cutechatbot.png?v=4" alt="">
+        <div>
+          <div class="title" id="title">VLT Knowledge Chatbot</div>
+          <div class="subtitle" id="subtitle">Hỏi về học vấn, kỹ năng, dự án, nghiên cứu và liên hệ.</div>
         </div>
       </div>
-
-      <div class="composer">
-        <textarea id="input" placeholder="Nhập câu hỏi… (Enter để gửi)"></textarea>
-        <button id="sendBtn">Gửi</button>
+      <div class="lang" aria-label="Language">
+        <button id="viBtn" class="active" type="button">VI</button>
+        <button id="enBtn" type="button">EN</button>
       </div>
-      <div class="footer-note">
-        <div class="suggest-wrap">
-          <span>Gợi ý câu hỏi:</span>
-          <select id="suggestSelect">
-            <option value="">Chọn một câu hỏi gợi ý</option>
-          </select>
-        </div>
-      </div>
-    </div>
-  </div>
-
+    </header>
+    <section class="messages" id="messages" aria-live="polite"></section>
+    <section class="chips" id="chips"></section>
+    <form class="composer" id="form">
+      <textarea id="input" rows="1" placeholder="Nhập câu hỏi..."></textarea>
+      <button class="send" id="send" type="submit">Gửi</button>
+    </form>
+  </main>
   <script>
-  const $messages = document.getElementById('messages');
-  const $input = document.getElementById('input');
-  const $send = document.getElementById('sendBtn');
-  const $langToggle = document.getElementById('langToggle');
-  const $toggleContainer = document.getElementById('toggleContainer');
-  const $suggest = document.getElementById('suggestSelect');
+    const messages = document.getElementById("messages");
+    const chips = document.getElementById("chips");
+    const form = document.getElementById("form");
+    const input = document.getElementById("input");
+    const send = document.getElementById("send");
+    const viBtn = document.getElementById("viBtn");
+    const enBtn = document.getElementById("enBtn");
+    const title = document.getElementById("title");
+    const subtitle = document.getElementById("subtitle");
+    let lang = "vi";
+    let typingRow = null;
 
-  let loadingRow = null;
-  let currentLang = "vi";
-
-  // Suggestions for both languages
-  const SUGGESTIONS_VI = [
-    "Bạn là ai?","Bạn tên đầy đủ là gì?","Bạn bao nhiêu tuổi?","Bạn sinh ra ở đâu?",
-    "Quê quán của bạn ở đâu?","Bạn học trường gì?","Bạn học ngành gì?","Bạn có tính cách thế nào?",
-    "Bạn thích môn thể thao nào?","Món ăn yêu thích của bạn?","Gia đình bạn có mấy người?",
-    "Triết lý sống của bạn là gì?","Bạn nói được những ngôn ngữ nào?","Bạn có bạn gái chưa?",
-    "Ước mơ nghề nghiệp của bạn?","Email của bạn?","Số điện thoại của bạn?"
-  ];
-
-  const SUGGESTIONS_EN = [
-    "Who are you?","What is your full name?","How old are you?","Where were you born?",
-    "Where is your hometown?","Which university did you study?","What was your major?",
-    "What is your personality like?","What sport do you like?","What is your favorite food?",
-    "How many people are in your family?","What is your life motto?","What languages do you speak?",
-    "Do you have a girlfriend?","What is your career goal?","What is your email?",
-    "What is your phone number?"
-  ];
-
-  function populateSelect(){
-    while($suggest.options.length > 1){ $suggest.remove(1); }
-    const list = currentLang === 'en' ? SUGGESTIONS_EN : SUGGESTIONS_VI;
-    list.forEach(q=>{
-      const opt = document.createElement('option');
-      opt.value = q; opt.textContent = q;
-      $suggest.appendChild(opt);
-    });
-  }
-
-  function setLang(lang){
-    currentLang = lang;
-    $langToggle.checked = (lang === 'en');
-    
-    if (lang === 'en') {
-      $toggleContainer.classList.add('english');
-      // đổi title/subtitle
-      document.getElementById('headerTitle').textContent = "🤖This is Vuong Loc Truong’s Chatbot :3";
-      document.getElementById('headerSubtitle').textContent = "You can ask about: hometown, education, hobbies, contact…";
-      // đổi UI khác
-      $input.placeholder = "Type a question… (Press Enter to send)";
-      $send.textContent = "Send";
-      document.querySelector('.footer-note span').textContent = "Suggested questions:";
-      $suggest.options[0].textContent = "Pick a suggestion";
-    } else {
-      $toggleContainer.classList.remove('english');
-      // đổi title/subtitle
-      document.getElementById('headerTitle').textContent = "🤖Đây là Chatbot của Vương Lộc Trường :3";
-      document.getElementById('headerSubtitle').textContent = "Bạn có thể hỏi về: quê quán, học vấn, sở thích, liên hệ…";
-      // đổi UI khác
-      $input.placeholder = "Nhập câu hỏi… (Enter để gửi)";
-      $send.textContent = "Gửi";
-      document.querySelector('.footer-note span').textContent = "Gợi ý câu hỏi:";
-      $suggest.options[0].textContent = "Chọn một câu hỏi gợi ý";
-    }
-    populateSelect();
-  }
-
-  // Click handler for toggle
-  $toggleContainer.addEventListener('click', (e) => {
-    e.preventDefault();
-    const newLang = currentLang === 'vi' ? 'en' : 'vi';
-    setLang(newLang);
-  });
-
-  // Also handle checkbox change for accessibility
-  $langToggle.addEventListener('change', () => {
-    setLang($langToggle.checked ? 'en' : 'vi');
-  });
-
-  function addMessage(text, who="bot"){
-    const row = document.createElement('div');
-    row.className = 'row ' + (who === 'user' ? 'user' : 'bot');
-    const bubble = document.createElement('div');
-    bubble.className = 'bubble';
-    bubble.textContent = text;
-
-    if(who === 'user'){
-      row.appendChild(bubble);
-    } else {
-      const av = document.createElement('div');
-      av.className = 'avatar';
-      const img = document.createElement('img');
-      img.src = '/static/cutechatbot.png';
-      img.alt = 'bot';
-      av.appendChild(img);
-      row.appendChild(av);
-      row.appendChild(bubble);
-    }
-    $messages.appendChild(row);
-    $messages.scrollTop = $messages.scrollHeight;
-  }
-
-  function setLoading(on){
-    $send.disabled = on;
-    if(on){
-      if(!loadingRow){
-        const row = document.createElement('div');
-        row.className = 'row bot';
-        const av = document.createElement('div');
-        av.className = 'avatar';
-        const img = document.createElement('img');
-        img.src = '/static/cutechatbot.png'; img.alt = 'bot';
-        av.appendChild(img);
-        const bubble = document.createElement('div');
-        bubble.className = 'bubble';
-        bubble.textContent = (currentLang === 'en') ? 'Thinking…' : 'Đang suy nghĩ…';
-        row.appendChild(av); row.appendChild(bubble);
-        $messages.appendChild(row);
-        $messages.scrollTop = $messages.scrollHeight;
-        loadingRow = row;
+    const copy = {
+      vi: {
+        hello: "Chào bạn! Mình trả lời dựa trên knowledge base markdown của Vương Lộc Trường. Bạn muốn hỏi gì?",
+        placeholder: "Nhập câu hỏi...",
+        send: "Gửi",
+        title: "VLT Knowledge Chatbot",
+        subtitle: "Hỏi về học vấn, kỹ năng, dự án, nghiên cứu và liên hệ.",
+        error: "Có lỗi kết nối. Bạn thử lại giúp mình nhé.",
+        suggestions: [
+          "Bạn có thể làm gì?",
+          "Các dự án AI của bạn?",
+          "Bạn đang nghiên cứu gì?",
+          "Những công nghệ bạn sử dụng?",
+          "Thông tin liên hệ của bạn?"
+        ]
+      },
+      en: {
+        hello: "Hi! I answer from Vuong Loc Truong's local markdown knowledge base. What would you like to know?",
+        placeholder: "Type a question...",
+        send: "Send",
+        title: "VLT Knowledge Chatbot",
+        subtitle: "Ask about education, skills, projects, research, and contact.",
+        error: "Connection error. Please try again.",
+        suggestions: [
+          "What can you do?",
+          "Your AI projects?",
+          "What are you researching?",
+          "What technologies do you use?",
+          "How can I contact you?"
+        ]
       }
-    } else {
-      if(loadingRow){ loadingRow.remove(); loadingRow = null; }
-    }
-  }
+    };
 
-  async function ask(q){
-    try{
-      const resp = await fetch('/ask', {
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ question: q, lang: currentLang })
+    function scrollToBottom() {
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    function addMessage(text, who = "bot", meta = "") {
+      const row = document.createElement("div");
+      row.className = `row ${who}`;
+      if (who === "bot") {
+        const avatar = document.createElement("div");
+        avatar.className = "avatar";
+        avatar.innerHTML = '<img src="/static/cutechatbot.png?v=4" alt="">';
+        row.appendChild(avatar);
+      }
+      const bubble = document.createElement("div");
+      bubble.className = "bubble";
+      bubble.textContent = text;
+      if (meta) {
+        const details = document.createElement("div");
+        details.className = "meta";
+        details.textContent = meta;
+        bubble.appendChild(details);
+      }
+      row.appendChild(bubble);
+      messages.appendChild(row);
+      scrollToBottom();
+    }
+
+    function showTyping() {
+      if (typingRow) return;
+      typingRow = document.createElement("div");
+      typingRow.className = "row bot";
+      typingRow.innerHTML = '<div class="avatar"><img src="/static/cutechatbot.png?v=4" alt=""></div><div class="bubble"><div class="typing"><span></span><span></span><span></span></div></div>';
+      messages.appendChild(typingRow);
+      scrollToBottom();
+    }
+
+    function hideTyping() {
+      if (typingRow) typingRow.remove();
+      typingRow = null;
+    }
+
+    function renderChips() {
+      chips.innerHTML = "";
+      copy[lang].suggestions.forEach((text) => {
+        const chip = document.createElement("button");
+        chip.className = "chip";
+        chip.type = "button";
+        chip.textContent = text;
+        chip.addEventListener("click", () => {
+          input.value = text;
+          submitQuestion();
+        });
+        chips.appendChild(chip);
       });
-      const data = await resp.json();
-      return data.answer || (currentLang === 'en' ? "Sorry, I didn't catch that." : "Xin lỗi, mình chưa rõ câu hỏi.");
-    }catch(e){
-      console.error(e);
-      return (currentLang === 'en') ? "Connection error." : "Có lỗi kết nối.";
     }
-  }
 
-  async function onSend(){
-    const q = $input.value.trim();
-    if(!q) return;
-    addMessage(q, 'user');
-    $input.value = ""; $input.focus();
-
-    setLoading(true);
-    const a = await ask(q);
-    setLoading(false);
-    addMessage(a, 'bot');
-
-    $suggest.value = "";
-  }
-
-  $suggest.addEventListener('change', ()=>{
-    const q = $suggest.value;
-    if(!q) return;
-    $input.value = q;
-    onSend();
-  });
-
-  $send.addEventListener('click', onSend);
-  $input.addEventListener('keydown', (e)=>{
-    if(e.key === 'Enter' && !e.shiftKey){
-      e.preventDefault();
-      onSend();
+    function setLang(nextLang) {
+      lang = nextLang;
+      viBtn.classList.toggle("active", lang === "vi");
+      enBtn.classList.toggle("active", lang === "en");
+      input.placeholder = copy[lang].placeholder;
+      send.textContent = copy[lang].send;
+      title.textContent = copy[lang].title;
+      subtitle.textContent = copy[lang].subtitle;
+      renderChips();
     }
-  });
 
-  setLang('vi');     // default VN
-  populateSelect();
+    async function submitQuestion() {
+      const question = input.value.trim();
+      if (!question) return;
+      addMessage(question, "user");
+      input.value = "";
+      input.focus();
+      send.disabled = true;
+      showTyping();
+      try {
+        const response = await fetch("/ask", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ question, lang })
+        });
+        const data = await response.json();
+        const sourceText = (data.sources || []).map((s) => s.title).join(", ");
+        const meta = data.type === "semantic"
+          ? `confidence ${Number(data.confidence || 0).toFixed(2)}${sourceText ? " | sources: " + sourceText : ""}`
+          : `confidence ${Number(data.confidence || 0).toFixed(2)}`;
+        hideTyping();
+        addMessage(data.answer || copy[lang].error, "bot", meta);
+      } catch (error) {
+        hideTyping();
+        addMessage(copy[lang].error, "bot");
+      } finally {
+        send.disabled = false;
+      }
+    }
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      submitQuestion();
+    });
+    input.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        submitQuestion();
+      }
+    });
+    viBtn.addEventListener("click", () => setLang("vi"));
+    enBtn.addEventListener("click", () => setLang("en"));
+
+    setLang("vi");
+    addMessage(copy.vi.hello, "bot");
   </script>
-  </body>
+</body>
 </html>
 """
-
-@app.get("/", response_class=HTMLResponse)
-async def home():
-    return HTML_FORM
-
-@app.post("/ask-form")
-async def ask_form(q: str = Form(...), lang: str = Form("vi")):
-    return JSONResponse({"answer": get_answer(q, lang)})
-
-@app.post("/ask")
-async def ask_api(body: AskBody):
-    ans = get_answer(body.question, body.lang)
-    return JSONResponse({"answer": ans})
-
-def get_answer(question: str, lang: str) -> str:
-    lang = "en" if lang == "en" else "vi"
-    
-    # Ưu tiên exact matching với các câu hỏi trong QA
-    norm_question = normalize(question)
-    if lang == "vi":
-        for q, a in QA_VI:
-            if normalize(q) == norm_question:
-                return a
-    else:
-        for q, a in QA_EN:
-            if normalize(q) == norm_question:
-                return a
-    
-    # Sau đó mới đến intent matching
-    intent_name = match_intent(question)
-    if intent_name:
-        ans = answer_for_intent(intent_name, lang)
-        if ans:
-            return ans
-    
-    # Cuối cùng là semantic matching
-    ans = embedding_match(question, lang)
-    if ans:
-        return ans
-        
-    ans = semantic_match(question, lang)
-    if ans:
-        return ans
-        
-    return fallback(lang)
-
-# @app.on_event("startup")
-# async def _startup():
-#     ensure_embed_model()
-
-@app.middleware("http")
-async def cache_headers(request, call_next):
-    resp = await call_next(request)
-    path = request.url.path
-    if path == "/":
-        resp.headers["Cache-Control"] = "no-store"
-    elif path.startswith("/static/"):
-        resp.headers.setdefault(
-            "Cache-Control", "public, max-age=300, s-maxage=300, must-revalidate"
-        )
-    return resp
-
-# if __name__ == "__main__":
-#     import uvicorn
-#     uvicorn.run("app:app", host="0.0.0.0", port=8000, reload=True)

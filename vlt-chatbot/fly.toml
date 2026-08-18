@@ -6,9 +6,9 @@ primary_region = "sin"
 [http_service]
   internal_port = 8000
   force_https = true
-  auto_stop_machines = true        # <— tự tắt khi rảnh
+  auto_stop_machines = true
   auto_start_machines = true
-  min_machines_running = 0         # <— cho phép về 0
+  min_machines_running = 0
   strategy = "immediate"
 
   [[http_service.checks]]
@@ -22,7 +22,9 @@ primary_region = "sin"
 [[vm]]
   cpu_kind  = "shared"
   cpus      = 1
-  memory_mb = 512                  # <— bắt đầu với 512MB; nếu OOM, đổi lại 1024
+  memory_mb = 512
 
 [env]
-  PROFILE_PATH = "data/profile.json"
+  KNOWLEDGE_DIR = "data/knowledge"
+  EMBED_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
+  TOP_K = "4"
