@@ -22,7 +22,7 @@ class ChatAnswer:
 
 
 class GroundedComposer:
-    def __init__(self, min_confidence: float = 0.34, max_sentences: int = 5) -> None:
+    def __init__(self, min_confidence: float = 0.50, max_sentences: int = 5) -> None:
         self.min_confidence = min_confidence
         self.max_sentences = max_sentences
 

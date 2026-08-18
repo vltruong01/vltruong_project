@@ -96,7 +96,7 @@ def get_answer(question: str, lang: str = "vi") -> dict:
     answer = composer.compose(question, results, lang=lang)
     if answer.type == "unknown":
         return {
-            "answer": legacy_matcher.fallback(lang),
+            "answer": answer.answer,
             "confidence": answer.confidence,
             "type": answer.type,
             "sources": answer.sources,
@@ -240,6 +240,8 @@ HTML_FORM = """
     }
     .row.user .bubble { background: var(--user); color: white; border-bottom-right-radius: 5px; }
     .row.bot .bubble { background: var(--bot); border: 1px solid var(--border); border-bottom-left-radius: 5px; }
+    .bubble a { color: var(--accent); font-weight: 700; text-decoration: underline; }
+    .row.user .bubble a { color: white; }
     .meta { color: var(--muted); font-size: 12px; margin-top: 8px; }
     .chips {
       display: flex;
@@ -426,6 +428,31 @@ HTML_FORM = """
       messages.scrollTop = messages.scrollHeight;
     }
 
+    function renderTextWithLinks(container, text) {
+      const urlPattern = /(https?:\\/\\/[^\\s]+)/g;
+      let lastIndex = 0;
+      for (const match of text.matchAll(urlPattern)) {
+        if (match.index > lastIndex) {
+          container.appendChild(document.createTextNode(text.slice(lastIndex, match.index)));
+        }
+        const url = match[0].replace(/[),.]+$/, "");
+        const trailing = match[0].slice(url.length);
+        const link = document.createElement("a");
+        link.href = url;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        link.textContent = url;
+        container.appendChild(link);
+        if (trailing) {
+          container.appendChild(document.createTextNode(trailing));
+        }
+        lastIndex = match.index + match[0].length;
+      }
+      if (lastIndex < text.length) {
+        container.appendChild(document.createTextNode(text.slice(lastIndex)));
+      }
+    }
+
     function addMessage(text, who = "bot", meta = "") {
       const row = document.createElement("div");
       row.className = `row ${who}`;
@@ -437,7 +464,7 @@ HTML_FORM = """
       }
       const bubble = document.createElement("div");
       bubble.className = "bubble";
-      bubble.textContent = text;
+      renderTextWithLinks(bubble, text);
       if (meta) {
         const details = document.createElement("div");
         details.className = "meta";
@@ -504,12 +531,8 @@ HTML_FORM = """
           body: JSON.stringify({ question, lang })
         });
         const data = await response.json();
-        const sourceText = (data.sources || []).map((s) => s.title).join(", ");
-        const scoreLabel = lang === "vi" ? "độ chắc chắn" : "certainty";
-        const sourceLabel = lang === "vi" ? "nguồn" : "sources";
-        const meta = data.type === "semantic"
-          ? `${scoreLabel} ${Number(data.confidence || 0).toFixed(2)}${sourceText ? " | " + sourceLabel + ": " + sourceText : ""}`
-          : `${scoreLabel} ${Number(data.confidence || 0).toFixed(2)}`;
+        const scoreLabel = lang === "vi" ? "Độ chính xác" : "Accuracy";
+        const meta = `${scoreLabel} ${Number(data.confidence || 0).toFixed(2)}`;
         hideTyping();
         addMessage(data.answer || copy[lang].error, "bot", meta);
       } catch (error) {
