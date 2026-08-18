@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 from contextlib import asynccontextmanager
 from pathlib import Path
+from threading import Lock
 from typing import List
 
 from fastapi import FastAPI
@@ -25,15 +26,15 @@ TOP_K = int(os.environ.get("TOP_K", "4"))
 
 chunks: List[KnowledgeChunk] = []
 retriever: SemanticRetriever | None = None
+retriever_lock = Lock()
 composer = GroundedComposer()
 legacy_matcher = LegacyProfileMatcher(PROFILE_PATH)
 
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
-    global chunks, retriever
+    global chunks
     chunks = load_knowledge(KNOWLEDGE_DIR)
-    retriever = SemanticRetriever(chunks, model_name=MODEL_NAME)
     yield
 
 
@@ -61,7 +62,12 @@ class AskBody(BaseModel):
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "knowledge_chunks": len(chunks), "model": MODEL_NAME}
+    return {
+        "status": "ok",
+        "knowledge_chunks": len(chunks),
+        "model": MODEL_NAME,
+        "retriever_loaded": retriever is not None,
+    }
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -84,7 +90,7 @@ def get_answer(question: str, lang: str = "vi") -> dict:
             "sources": legacy_answer.sources,
         }
 
-    active_retriever = retriever
+    active_retriever = get_retriever()
     if active_retriever is None:
         return {
             "answer": "Knowledge index is still starting. Please try again in a moment.",
@@ -107,6 +113,18 @@ def get_answer(question: str, lang: str = "vi") -> dict:
         "type": answer.type,
         "sources": answer.sources,
     }
+
+
+def get_retriever() -> SemanticRetriever | None:
+    global retriever
+    if retriever is not None:
+        return retriever
+    if not chunks:
+        return None
+    with retriever_lock:
+        if retriever is None:
+            retriever = SemanticRetriever(chunks, model_name=MODEL_NAME)
+    return retriever
 
 
 @app.middleware("http")
