@@ -139,23 +139,89 @@
     {
       "name": "hobbies",
       "keywords": {
-        "vi": ["sở thích", "so thich", "thích gì", "thich gi", "giải trí", "giai tri", "ngoài giờ học", "ngoai gio hoc", "game", "gaming", "thể thao", "the thao", "cầu lông", "cau long", "chơi game", "choi game", "roblox", "đánh bài", "danh bai"],
-        "en": ["hobby", "hobbies", "games", "gaming", "sports", "badminton", "roblox", "cards", "card game"]
+        "vi": ["sở thích", "so thich", "thích gì", "thich gi", "giải trí", "giai tri", "ngoài giờ học", "ngoai gio hoc"],
+        "en": ["hobby", "hobbies", "free time", "outside studying"]
       },
       "answer": {
-        "vi": "Ngoài giờ học, Trường thích chơi game nhiều thể loại, đặc biệt là Roblox khi có bạn bè chơi chung. Thể thao thì thích cầu lông. Còn ai rủ đánh bài thì Trường chơi tới bến, miễn là vui vẻ văn minh, không biến ví tiền thành đề tài nghiên cứu.",
-        "en": "Outside of studying, Truong enjoys many types of games, especially Roblox with friends. For sports, he likes badminton. If someone invites him to play cards, he is in for the fun, as long as everyone keeps it friendly."
+        "vi": "Sở thích của Trường xoay quanh mấy món rất đời: chơi game, cầu lông, nằm ở nhà thư giãn và lâu lâu có kèo đánh bài vui vẻ thì nhập cuộc. Nói chung là combo tiết kiệm năng lượng nhưng vẫn đủ vui.",
+        "en": "Truong's hobbies are simple and very real: gaming, badminton, relaxing at home, and sometimes joining a friendly card game. Low energy, but still fun."
       }
     },
     {
-      "name": "favorites",
+      "name": "favorite_games",
       "keywords": {
-        "vi": ["món ăn yêu thích", "mon an yeu thich", "thích ăn gì", "thich an gi", "món khoái khẩu", "mon khoai khau", "bánh cuốn nóng", "banh cuon nong", "màu yêu thích", "mau yeu thich", "màu gì", "mau gi", "nhạc", "nhac", "bài hát", "bai hat", "anime", "dragon ball", "7 viên ngọc rồng"],
-        "en": ["favorite food", "what food do you like", "favorite color", "color", "music", "song", "anime", "dragon ball"]
+        "vi": ["game", "gaming", "chơi game", "choi game", "roblox", "hay chơi game gì", "hay choi game gi"],
+        "en": ["games", "gaming", "what games", "roblox"]
       },
       "answer": {
-        "vi": "Gu yêu thích của Trường khá rõ: món mê nhất là bánh cuốn nóng, màu thích là đỏ và xanh lá, bài nhạc thích nhất là 'Ngày này năm ấy', còn anime chân ái là 7 viên ngọc rồng. Nói chung gu không quá cầu kỳ, nhưng đã thích là nhớ rất dai.",
-        "en": "Truong's favorites are pretty clear: hot banh cuon is his top food, red and green are his favorite colors, his favorite song is 'Ngay nay nam ay', and his favorite anime is Dragon Ball."
+        "vi": "Trường chơi nhiều thể loại game, nhưng thích Roblox nhất khi chơi cùng bạn bè. Game một mình cũng vui, nhưng có hội bạn vào là độ vui tăng như được buff chỉ số.",
+        "en": "Truong plays many types of games, but he especially likes Roblox with friends. Solo gaming is fun, but friends give it a serious happiness buff."
+      }
+    },
+    {
+      "name": "favorite_sport",
+      "keywords": {
+        "vi": ["thể thao", "the thao", "môn thể thao", "mon the thao", "cầu lông", "cau long"],
+        "en": ["sport", "sports", "badminton"]
+      },
+      "answer": {
+        "vi": "Trường thích cầu lông. Vừa vận động, vừa giải tỏa căng thẳng, lại có cảm giác đánh một cú đẹp là tự tin như nhân vật chính trong phim thể thao.",
+        "en": "Truong likes badminton. It is active, relaxing, and one good shot can briefly make him feel like the main character in a sports movie."
+      }
+    },
+    {
+      "name": "card_game",
+      "keywords": {
+        "vi": ["đánh bài", "danh bai", "chơi bài", "choi bai"],
+        "en": ["cards", "card game", "playing cards"]
+      },
+      "answer": {
+        "vi": "Ai rủ đánh bài thì Trường chơi tới bến. Tinh thần là vui vẻ, giải trí, và giữ tình bạn nguyên vẹn sau ván cuối.",
+        "en": "If someone invites Truong to play cards, he is in. The goal is fun, entertainment, and keeping the friendship alive after the last round."
+      }
+    },
+    {
+      "name": "favorite_food",
+      "keywords": {
+        "vi": ["món ăn yêu thích", "mon an yeu thich", "thích ăn gì", "thich an gi", "món khoái khẩu", "mon khoai khau", "bánh cuốn nóng", "banh cuon nong", "món ăn thích nhất", "mon an thich nhat"],
+        "en": ["favorite food", "what food do you like", "most favorite food", "banh cuon"]
+      },
+      "answer": {
+        "vi": "Món Trường thích nhất là bánh cuốn nóng. Nóng hổi, mềm mềm, ăn vào là thấy cuộc đời bớt căng thẳng hẳn.",
+        "en": "Truong's top favorite food is hot banh cuon. Warm, soft, comforting, and dangerously good."
+      }
+    },
+    {
+      "name": "favorite_color",
+      "keywords": {
+        "vi": ["màu yêu thích", "mau yeu thich", "màu gì", "mau gi", "thích màu", "thich mau", "màu đỏ", "mau do", "xanh lá", "xanh la"],
+        "en": ["favorite color", "colors do you like", "what color", "red", "green"]
+      },
+      "answer": {
+        "vi": "Trường thích màu đỏ và xanh lá. Một màu cháy hết mình, một màu chữa lành nhẹ, phối lại nghe hơi Noel nhưng Trường thích là được.",
+        "en": "Truong likes red and green. One feels bold, one feels fresh. Together they may look a bit festive, but he likes them anyway."
+      }
+    },
+    {
+      "name": "favorite_song",
+      "keywords": {
+        "vi": ["nhạc", "nhac", "bài hát", "bai hat", "bài hát yêu thích", "bai hat yeu thich", "ngày này năm ấy", "ngay nay nam ay"],
+        "en": ["favorite song", "music", "song", "ngay nay nam ay"]
+      },
+      "answer": {
+        "vi": "Bài nhạc Trường thích nhất là 'Ngày này năm ấy'. Nghe vào là mood tự động chuyển sang chế độ suy tư nhẹ.",
+        "en": "Truong's favorite song is 'Ngay nay nam ay'. It instantly switches his mood into gentle nostalgia mode."
+      }
+    },
+    {
+      "name": "favorite_anime",
+      "keywords": {
+        "vi": ["anime", "phim hoạt hình", "phim hoat hinh", "dragon ball", "7 viên ngọc rồng", "bay vien ngoc rong"],
+        "en": ["anime", "dragon ball", "favorite anime"]
+      },
+      "answer": {
+        "vi": "Anime Trường thích nhất là 7 viên ngọc rồng. Tuổi thơ có Goku là tuổi thơ có năng lượng, thiếu điều chưa tự biến Super Saiyan được thôi.",
+        "en": "Truong's favorite anime is Dragon Ball. Childhood with Goku just hits different, even if he still has not unlocked Super Saiyan mode."
       }
     },
     {
