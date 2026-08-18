@@ -125,7 +125,7 @@ HTML_FORM = """
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>VLT RAG Chatbot</title>
+  <title>Chatbot của VLTrường</title>
   <link rel="icon" href="/static/cutechatbot.png?v=4">
   <style>
     :root {
