@@ -4,7 +4,6 @@ from dataclasses import dataclass
 from typing import List
 
 import numpy as np
-from sentence_transformers import SentenceTransformer
 
 from .knowledge import KnowledgeChunk
 from .utils import normalize_text
@@ -90,6 +89,8 @@ class SemanticRetriever:
         model_name: str = "sentence-transformers/all-MiniLM-L6-v2",
     ) -> None:
         self.chunks = chunks
+        from sentence_transformers import SentenceTransformer
+
         self.model = SentenceTransformer(model_name, device="cpu")
         self.embeddings = self._encode([self._text_for_embedding(chunk) for chunk in chunks])
 
@@ -153,3 +154,23 @@ class SemanticRetriever:
     def _alias_matched(query: str, category: str) -> bool:
         normalized_query = normalize_text(query)
         return any(alias in normalized_query for alias in CATEGORY_ALIASES.get(category, set()))
+
+
+class LexicalRetriever:
+    def __init__(self, chunks: List[KnowledgeChunk]) -> None:
+        self.chunks = chunks
+
+    def search(self, query: str, top_k: int = 4) -> List[RetrievalResult]:
+        if not query.strip() or not self.chunks:
+            return []
+
+        scores = np.array(
+            [SemanticRetriever._lexical_score(query, chunk) for chunk in self.chunks],
+            dtype=np.float32,
+        )
+        top_indices = np.argsort(scores)[::-1][:top_k]
+        return [
+            RetrievalResult(chunk=self.chunks[int(index)], score=float(scores[int(index)]))
+            for index in top_indices
+            if scores[int(index)] > 0
+        ]

@@ -1,6 +1,6 @@
 # VLT Personal RAG Chatbot
 
-A CPU-only personal knowledge chatbot built with FastAPI, SentenceTransformer embeddings, cosine similarity, and markdown files.
+A CPU-only personal knowledge chatbot built with FastAPI, markdown knowledge files, deterministic FAQ matching, and a local retrieval layer.
 
 This project does not use OpenAI API, Gemini API, Claude API, paid AI APIs, GPU, Redis, PostgreSQL, or a cloud vector database.
 
@@ -10,8 +10,7 @@ This project does not use OpenAI API, Gemini API, Claude API, paid AI APIs, GPU,
 Question
 -> Legacy FAQ exact match
 -> Legacy intent keyword match
--> Query embedding
--> Semantic retrieval
+-> Local retrieval
 -> Top-K markdown knowledge chunks
 -> Grounded answer composer
 -> JSON response
@@ -26,7 +25,7 @@ app.py
 chatbot/
   knowledge.py   # load markdown documents and create chunks
   legacy.py      # original FAQ and intent answers from profile.json
-  retriever.py   # SentenceTransformer + cosine similarity
+  retriever.py   # semantic retrieval or lightweight lexical fallback
   composer.py    # non-LLM grounded answer composition
   utils.py       # normalization and small helpers
 data/
@@ -51,14 +50,13 @@ At startup:
 1. Load all `data/knowledge/*.md` files.
 2. Split markdown into chunks.
 3. Attach metadata to each chunk: `id`, `title`, `category`, `content`, `source`.
-4. Encode all chunks once with `sentence-transformers/all-MiniLM-L6-v2`.
-5. Keep embeddings in memory.
+4. Keep chunks in memory.
 
 Per request:
 
 1. Try exact FAQ and intent matching from `data/profile.json`.
-2. If no legacy answer is found, encode the user question.
-3. Compute cosine similarity against cached chunk embeddings.
+2. If no legacy answer is found, search the markdown knowledge chunks.
+3. Use `RETRIEVAL_BACKEND=semantic` for SentenceTransformer retrieval or `RETRIEVAL_BACKEND=lexical` for the low-memory Fly.io fallback.
 4. Select Top-K chunks.
 5. Compose an answer from retrieved content.
 6. Return fallback if confidence is low.
@@ -153,10 +151,11 @@ fly deploy
 
 The Docker image preloads the embedding model during build, so the app does not need to download the model at runtime.
 
+The Fly.io config uses `RETRIEVAL_BACKEND=lexical` to stay stable on a 512MB shared CPU machine. Use `RETRIEVAL_BACKEND=semantic` only when the machine has enough RAM for PyTorch and SentenceTransformer at runtime.
+
 ## Runtime Notes
 
 - Runs on CPU.
-- Uses the lightweight `all-MiniLM-L6-v2` embedding model.
-- Embeddings are generated once at startup, not on every request.
-- Only the query is encoded per request.
+- Supports the lightweight `all-MiniLM-L6-v2` embedding model in semantic mode.
+- Uses a low-memory lexical retrieval fallback on Fly.io.
 - Best for factual profile, portfolio, FAQ, education, skills, projects, thesis, experience, contact, and certification data.

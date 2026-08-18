@@ -15,7 +15,7 @@ from pydantic import BaseModel
 from chatbot.composer import GroundedComposer
 from chatbot.knowledge import KnowledgeChunk, load_knowledge
 from chatbot.legacy import LegacyProfileMatcher
-from chatbot.retriever import SemanticRetriever
+from chatbot.retriever import LexicalRetriever, SemanticRetriever
 
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -23,9 +23,10 @@ PROFILE_PATH = Path(os.environ.get("PROFILE_PATH", BASE_DIR / "data" / "profile.
 KNOWLEDGE_DIR = Path(os.environ.get("KNOWLEDGE_DIR", BASE_DIR / "data" / "knowledge"))
 MODEL_NAME = os.environ.get("EMBED_MODEL", "sentence-transformers/all-MiniLM-L6-v2")
 TOP_K = int(os.environ.get("TOP_K", "4"))
+RETRIEVAL_BACKEND = os.environ.get("RETRIEVAL_BACKEND", "semantic").lower()
 
 chunks: List[KnowledgeChunk] = []
-retriever: SemanticRetriever | None = None
+retriever: SemanticRetriever | LexicalRetriever | None = None
 retriever_lock = Lock()
 composer = GroundedComposer()
 legacy_matcher = LegacyProfileMatcher(PROFILE_PATH)
@@ -66,6 +67,7 @@ def health():
         "status": "ok",
         "knowledge_chunks": len(chunks),
         "model": MODEL_NAME,
+        "retrieval_backend": RETRIEVAL_BACKEND,
         "retriever_loaded": retriever is not None,
     }
 
@@ -115,7 +117,7 @@ def get_answer(question: str, lang: str = "vi") -> dict:
     }
 
 
-def get_retriever() -> SemanticRetriever | None:
+def get_retriever() -> SemanticRetriever | LexicalRetriever | None:
     global retriever
     if retriever is not None:
         return retriever
@@ -123,7 +125,10 @@ def get_retriever() -> SemanticRetriever | None:
         return None
     with retriever_lock:
         if retriever is None:
-            retriever = SemanticRetriever(chunks, model_name=MODEL_NAME)
+            if RETRIEVAL_BACKEND == "lexical":
+                retriever = LexicalRetriever(chunks)
+            else:
+                retriever = SemanticRetriever(chunks, model_name=MODEL_NAME)
     return retriever
 
 
