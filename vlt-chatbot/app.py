@@ -349,7 +349,7 @@ HTML_FORM = """
 
     const copy = {
       vi: {
-        hello: "Chào bạn! Mình là chatbot giới thiệu về Vương Lộc Trường. Bạn muốn hỏi điều gì? 😊\nĐây là toàn bộ infor của mình bạn có thể click vào nhé: https://vlt-infor.fly.dev/",
+        hello: "Chào bạn! Mình là chatbot giới thiệu về Vương Lộc Trường. Bạn muốn hỏi điều gì? 😊\\nĐây là toàn bộ infor của mình bạn có thể click vào nhé: https://vlt-infor.fly.dev/",
         placeholder: "Nhập câu hỏi...",
         send: "Gửi",
         title: "VLT Knowledge Chatbot",
