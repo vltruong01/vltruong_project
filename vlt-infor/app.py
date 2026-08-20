@@ -2,267 +2,265 @@ from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 
+app = FastAPI(title="VLT Infor", version="1.0")
 
-app = FastAPI(title="VLT Infor", version="1.1")
+# phục vụ /static/*
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-HTML = """<!doctype html>
+HTML = """
+<!doctype html>
 <html lang="vi">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Các liên kết và thông tin của Vương Lộc Trường.">
-  <meta property="og:title" content="Vương Lộc Trường | Links">
-  <meta property="og:description" content="Tổng hợp liên kết, dự án và chatbot của Vương Lộc Trường.">
-  <meta property="og:type" content="website">
-  <meta name="theme-color" content="#101827">
-  <title>Vương Lộc Trường | Links</title>
-  <link rel="icon" type="image/png" href="/static/fav.png">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>VLT • Information</title>
+
+  <meta property="og:title" content="Vương Lộc Trường — Links" />
+  <meta property="og:description" content="Tổng hợp liên kết của Vương Lộc Trường: Facebook, Zalo, Instagram, TikTok, Chatbot…" />
+  <meta property="og:type" content="website" />
+  <meta name="theme-color" content="#111827" />
+
+  <link rel="icon" type="image/png" href="/static/fav.png" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    :root {
-      color-scheme: dark;
-      --bg: #0b1220;
-      --panel: rgba(18, 28, 46, .9);
-      --panel-soft: #152238;
-      --text: #f8fafc;
-      --muted: #a8b4c7;
-      --line: rgba(148, 163, 184, .22);
-      --accent: #60a5fa;
-      --success: #34d399;
-      --shadow: 0 24px 70px rgba(0, 0, 0, .3);
+    body{
+      background:
+        radial-gradient(1200px 600px at 10% -10%, rgba(59,130,246,.12), transparent 50%),
+        radial-gradient(800px 400px at 100% 0%, rgba(139,92,246,.12), transparent 40%),
+        #0b1220;
     }
-    * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-    body {
-      min-width: 320px;
-      min-height: 100vh;
-      margin: 0;
-      padding: 24px 16px;
-      background: var(--bg);
-      color: var(--text);
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    }
-    body::before {
-      position: fixed;
-      inset: 0;
-      z-index: -1;
-      content: "";
-      background: linear-gradient(135deg, rgba(37, 99, 235, .16), transparent 42%),
-                  linear-gradient(315deg, rgba(16, 185, 129, .1), transparent 38%);
-      pointer-events: none;
-    }
-    main { width: min(680px, 100%); margin: 0 auto; }
-    .profile {
-      padding: 28px 20px 22px;
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      background: var(--panel);
-      box-shadow: var(--shadow);
-      text-align: center;
-      backdrop-filter: blur(16px);
-    }
-    .avatar {
-      display: block;
-      width: 132px;
-      height: 132px;
-      margin: 0 auto;
-      padding: 4px;
-      border: 0;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--accent), var(--success));
-      cursor: zoom-in;
-    }
-    .avatar img { display: block; width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
-    h1 { margin: 18px 0 7px; font-size: clamp(28px, 7vw, 40px); line-height: 1.1; }
-    .intro { max-width: 470px; margin: 0 auto; color: var(--muted); line-height: 1.6; }
-    .quick-facts { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; margin-top: 17px; }
-    .fact { padding: 7px 11px; border: 1px solid var(--line); border-radius: 999px; color: #dbeafe; background: rgba(37, 99, 235, .12); font-size: 13px; }
-    .links { display: grid; gap: 11px; margin-top: 25px; }
     .link-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      min-height: 52px;
-      padding: 12px 16px;
-      border: 1px solid var(--line);
-      border-radius: 11px;
-      color: var(--text);
-      background: var(--panel-soft);
-      font: inherit;
-      font-weight: 700;
-      text-decoration: none;
-      cursor: pointer;
-      transition: transform .16s ease, border-color .16s ease, background .16s ease;
+      display:flex; justify-content:center; align-items:center; gap:10px;
     }
-    .link-btn:hover, .link-btn:focus-visible { transform: translateY(-2px); border-color: var(--accent); background: #1b2e4c; }
-    .link-btn:focus-visible, .modal-close:focus-visible { outline: 3px solid rgba(96, 165, 250, .45); outline-offset: 2px; }
-    .link-btn img { width: 23px; height: 23px; object-fit: contain; }
-    .link-btn.primary { border-color: rgba(96, 165, 250, .55); background: rgba(37, 99, 235, .26); }
-    .link-btn.green { border-color: rgba(52, 211, 153, .48); background: rgba(16, 185, 129, .18); }
-    .link-btn.pink { border-color: rgba(244, 114, 182, .45); background: rgba(219, 39, 119, .16); }
-    .link-btn.indigo { border-color: rgba(129, 140, 248, .5); background: rgba(79, 70, 229, .19); }
-    .link-btn .symbol { width: 23px; font-size: 20px; line-height: 1; }
-    footer { margin-top: 20px; color: #8290a5; font-size: 12px; }
-    .modal { display: none; position: fixed; inset: 0; z-index: 10; align-items: center; justify-content: center; padding: 16px; background: rgba(2, 6, 23, .78); }
-    .modal.is-open { display: flex; }
-    .modal-card { position: relative; width: min(410px, 100%); max-height: 92vh; overflow: auto; padding: 24px; border: 1px solid var(--line); border-radius: 16px; background: #17243a; box-shadow: var(--shadow); text-align: center; }
-    .modal-card h2 { margin: 0 0 16px; font-size: 20px; }
-    .modal-close { position: absolute; top: 10px; right: 10px; width: 34px; height: 34px; border: 0; border-radius: 50%; color: var(--muted); background: transparent; font-size: 23px; cursor: pointer; }
-    .modal-close:hover { color: var(--text); background: rgba(148, 163, 184, .14); }
-    .modal-text { color: var(--muted); line-height: 1.5; }
-    .progress { height: 9px; margin: 17px 0 10px; overflow: hidden; border-radius: 999px; background: #263752; }
-    .progress-bar { width: 0; height: 100%; border-radius: inherit; background: var(--accent); transition: width .25s ease; }
-    .countdown { font-size: 16px; font-weight: 700; }
-    .modal-actions { display: flex; justify-content: center; gap: 9px; margin-top: 18px; }
-    .small-btn { padding: 9px 14px; border: 0; border-radius: 8px; color: white; background: #334155; font: inherit; cursor: pointer; text-decoration: none; }
-    .small-btn.success { background: #059669; }
-    .bank-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 11px 0; padding: 12px; border: 1px solid var(--line); border-radius: 10px; background: #0f1b2d; }
-    .bank-name { display: flex; align-items: center; gap: 10px; min-width: 0; font-weight: 700; }
-    .bank-name img { width: 25px; height: 25px; object-fit: contain; }
-    .qr-img { display: block; width: min(280px, 100%); margin: 8px auto 0; border-radius: 10px; }
-    .avatar-large { display: block; max-width: 100%; max-height: 76vh; margin: 0 auto; border-radius: 12px; object-fit: contain; }
-    .toast { position: fixed; right: 16px; bottom: 16px; z-index: 20; padding: 11px 14px; border: 1px solid rgba(52, 211, 153, .45); border-radius: 9px; color: #d1fae5; background: #064e3b; opacity: 0; transform: translateY(10px); transition: .2s ease; pointer-events: none; }
-    .toast.show { opacity: 1; transform: translateY(0); }
-    @media (max-width: 520px) { body { padding: 12px; } .profile { padding: 24px 15px 18px; } .avatar { width: 116px; height: 116px; } .link-btn { min-height: 50px; } .modal-card { padding: 22px 16px; } }
-    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; } }
+    .link-btn img { width:22px; height:22px; }
+
+    /* Modal chung */
+    .modal {
+      position:fixed; inset:0; background:rgba(0,0,0,0.6);
+      display:none; justify-content:center; align-items:center; z-index:60;
+    }
+    .modal-content {
+      background:#1e293b; padding:20px; border-radius:12px;
+      width:360px; text-align:center; color:#e2e8f0;
+      border:1px solid #334155;
+    }
+    .btn { margin-top:14px; padding:8px 14px; background:#3b82f6; border:none; border-radius:8px; color:white; cursor:pointer; }
+
+    /* Progress */
+    .countdown { font-size:16px; font-weight:700; margin-top:10px; }
+    .progress { width:100%; height:10px; background:#334155; border-radius:6px; margin-top:10px; overflow:hidden; }
+    .progress #bar { height:100%; width:0%; background:#3b82f6; transition: width 1s linear; }
+
+    /* Avatar modal */
+    .avatar-img { max-width:90vw; max-height:80vh; border-radius:12px; }
+
+    /* ===== Bank modal + QR modal: giống format Anhsime ===== */
+    .modal h2 { font-size:18px; font-weight:700; margin-bottom:12px; }
+
+    .list-item {
+      display:flex; align-items:center; justify-content:space-between;
+      gap:12px; margin:12px 0; padding:11px 14px;
+      border:1px solid #334155; border-radius:9px; background:#0f172a;
+      font-size:15px;
+    }
+    .list-item .left {
+      display:flex; align-items:center; gap:10px;
+      flex:1 1 auto; min-width:0;
+      max-width: calc(100% - 100px);
+    }
+    .list-item .left img { width:24px; height:24px; flex:0 0 auto; }
+    .left span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+    .view-btn {
+      flex:0 0 auto; width:85px; white-space:nowrap;
+      background:#3b82f6; color:#fff; border:none; border-radius:7px;
+      padding:7px 9px; font-size:14px; line-height:1; cursor:pointer; text-align:center;
+    }
+
+    .download-link {
+      display:inline-block; margin-top:12px;
+      background:#10b981; color:white; padding:8px 14px;
+      border-radius:7px; font-size:14px; text-decoration:none;
+    }
+    .qr-img { width:260px; max-width:90%; margin:12px auto; border-radius:9px; }
+    /* ===== End Bank modal format ===== */
   </style>
 </head>
-<body>
-  <main>
-    <section class="profile" aria-labelledby="profile-title">
-      <button class="avatar" type="button" onclick="openModal('avatarModal')" aria-label="Xem ảnh đại diện lớn">
-        <img src="/static/avatarcuatoi.jpg" width="132" height="132" alt="Ảnh đại diện của Vương Lộc Trường" fetchpriority="high">
-      </button>
-      <h1 id="profile-title">Vương Lộc Trường</h1>
-      <p class="intro">Góc nhỏ để kết nối với mình, xem các dự án cá nhân và khám phá chatbot giới thiệu VLT.</p>
-      <div class="quick-facts" aria-label="Thông tin nhanh">
-        <span class="fact">AI &amp; Python</span><span class="fact">FastAPI</span><span class="fact">Research</span>
+<body class="min-h-screen text-slate-100 antialiased">
+  <main class="mx-auto w-[720px] max-w-[95vw] px-5 pt-5 pb-3">
+    <section class="bg-slate-900/60 backdrop-blur rounded-2xl border border-slate-700/60 shadow-xl p-6 md:p-8 text-center h-[700px]">
+
+      <!-- Avatar (click để mở modal ảnh lớn) -->
+      <div class="mx-auto w-40 h-40 rounded-full ring-4 ring-blue-500/30 overflow-hidden shadow-lg cursor-pointer" onclick="showAvatar()">
+        <img alt="avatar" class="w-full h-full object-cover" src="/static/avatarcuatoi.jpg" />
       </div>
-      <nav class="links" aria-label="Liên kết cá nhân">
-        <a class="link-btn primary" href="https://www.facebook.com/vltruong01/" target="_blank" rel="noopener noreferrer"><img src="/static/icons/facebook.png" width="23" height="23" alt="">Facebook</a>
-        <a class="link-btn" href="https://zalo.me/84869183424" target="_blank" rel="noopener noreferrer"><img src="/static/icons/zalo.png" width="23" height="23" alt="">Zalo</a>
-        <a class="link-btn pink" href="https://www.instagram.com/102vl_truong" target="_blank" rel="noopener noreferrer"><img src="/static/icons/instagram-optimized.png" width="23" height="23" alt="">Instagram</a>
-        <a class="link-btn" href="https://www.tiktok.com/@vltruong1" target="_blank" rel="noopener noreferrer"><img src="/static/icons/tiktok.png" width="23" height="23" alt="">TikTok</a>
-        <button class="link-btn green" type="button" onclick="openModal('bankModal')"><span class="symbol" aria-hidden="true">💳</span>Tài khoản thanh toán</button>
-        <button class="link-btn indigo" type="button" onclick="openChatbot()"><span class="symbol" aria-hidden="true">🤖</span>Chatbot giới thiệu VLT</button>
-        <button class="link-btn" type="button" onclick="copyEmail()"><span class="symbol" aria-hidden="true">✉</span>Copy email liên hệ</button>
-      </nav>
-      <footer>© 2026 Vương Lộc Trường · All rights reserved</footer>
+
+      <h1 class="mt-5 text-3xl md:text-4xl font-bold tracking-tight">Vương Lộc Trường</h1>
+      <p class="mt-2 text-slate-300">Đây là infor của mình ^^</p>
+
+      <!-- Liên kết -->
+      <div class="mt-6 space-y-3">
+        <a href="https://www.facebook.com/vltruong01/" target="_blank" rel="noopener"
+           class="link-btn w-full py-2.5 px-5 rounded-xl font-semibold text-[17px]
+                  border border-blue-500/40 bg-blue-600/20 hover:bg-blue-600/30 transition">
+          <img src="/static/icons/facebook.png" alt="Facebook"/>Facebook
+        </a>
+        <a href="https://zalo.me/84869183424" target="_blank" rel="noopener"
+           class="link-btn w-full py-2.5 px-5 rounded-xl font-semibold text-[17px]
+                  border border-cyan-500/40 bg-cyan-600/20 hover:bg-cyan-600/30 transition">
+          <img src="/static/icons/zalo.png" alt="Zalo"/>Zalo
+        </a>
+        <a href="https://www.instagram.com/102vl_truong" target="_blank" rel="noopener"
+           class="link-btn w-full py-2.5 px-5 rounded-xl font-semibold text-[17px]
+                  border border-pink-500/40 bg-pink-600/20 hover:bg-pink-600/30 transition">
+          <img src="/static/icons/instagram.png" alt="Instagram"/>Instagram
+        </a>
+        <a href="https://www.tiktok.com/@vltruong1" target="_blank" rel="noopener"
+           class="link-btn w-full py-2.5 px-5 rounded-xl font-semibold text-[17px]
+                  border border-rose-500/40 bg-rose-600/20 hover:bg-rose-600/30 transition">
+          <img src="/static/icons/tiktok.png" alt="TikTok"/>TikTok
+        </a>
+
+        <!-- Bank (ngay trên Chatbot) -->
+        <button onclick="openModal('bankModal')"
+           class="link-btn w-full py-2.5 px-5 rounded-xl font-semibold text-[17px]
+                  border border-emerald-500/50 bg-emerald-600/20 hover:bg-emerald-600/30 transition">
+          💳 Tài khoản thanh toán
+        </button>
+
+        <!-- Chatbot -->
+        <button onclick="openChatbot()"
+           class="link-btn w-full py-2.5 px-5 rounded-xl font-semibold text-[17px]
+                  border border-indigo-500/50 bg-indigo-600/20 hover:bg-indigo-600/30 transition">
+          🤖 Chatbot giới thiệu VLT
+        </button>
+      </div>
+
+      <p class="mt-6 text-xs text-slate-400 text-center">
+        © 2025 Vương Lộc Trường • All rights reserved
+      </p>
     </section>
   </main>
 
-  <div id="chatbotModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="chatbotTitle" onclick="backdropClose(event, 'chatbotModal')">
-    <div class="modal-card">
-      <button class="modal-close" type="button" aria-label="Đóng" onclick="closeModal('chatbotModal')">×</button>
-      <h2 id="chatbotTitle">Đang đánh thức chatbot</h2>
-      <p id="chatbotStatus" class="modal-text">Chatbot vừa được đánh thức. Bạn sẽ được chuyển tới đó khi sẵn sàng.</p>
+  <!-- Modal: Chờ Chatbot -->
+  <div id="chatbotModal" class="modal" onclick="backdropClose(event,'chatbotModal')">
+    <div class="modal-content">
+      <h2>⏳ Vui lòng chờ chatbot đánh răng</h2>
       <div class="countdown">Còn <span id="count">20</span> giây</div>
-      <div class="progress" aria-hidden="true"><div id="bar" class="progress-bar"></div></div>
-      <div class="modal-actions"><button class="small-btn" type="button" onclick="closeModal('chatbotModal')">Để sau</button></div>
+      <div class="progress"><div id="bar"></div></div>
+      <p id="status" class="mt-2 text-sm text-slate-300">Nó vừa mới ngủ dậy 🥱</p>
     </div>
   </div>
-  <div id="bankModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="bankTitle" onclick="backdropClose(event, 'bankModal')">
-    <div class="modal-card">
-      <button class="modal-close" type="button" aria-label="Đóng" onclick="closeModal('bankModal')">×</button>
-      <h2 id="bankTitle">Tài khoản thanh toán</h2>
-      <div class="bank-row"><div class="bank-name"><img src="/static/icons/bidv.png" width="25" height="25" alt="">BIDV</div><button class="small-btn success" type="button" onclick="showQR('/static/qr/qr_bidv.jpg')">Xem QR</button></div>
-      <div class="bank-row"><div class="bank-name"><img src="/static/icons/momo.png" width="25" height="25" alt="">MoMo</div><button class="small-btn success" type="button" onclick="showQR('/static/qr/qr_momo.jpg')">Xem QR</button></div>
+
+  <!-- Modal: Bank (giống Anhsime) -->
+  <div id="bankModal" class="modal" onclick="backdropClose(event, 'bankModal')">
+    <div class="modal-content">
+      <h2>💳 Tài khoản thanh toán</h2>
+      <div class="list-item">
+        <div class="left"><img src="/static/icons/bidv.png"/><span>BIDV</span></div>
+        <button class="view-btn" onclick="showQR('/static/qr/qr_bidv.jpg')">Xem QR</button>
+      </div>
+      <div class="list-item">
+        <div class="left"><img src="/static/icons/momo.png"/><span>MoMo</span></div>
+        <button class="view-btn" onclick="showQR('/static/qr/qr_momo.jpg')">Xem QR</button>
+      </div>
+      <button class="mt-3 px-3 py-2 bg-gray-500 rounded-lg text-sm" onclick="closeModal('bankModal')">Đóng</button>
     </div>
   </div>
-  <div id="qrModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="qrTitle" onclick="backdropClose(event, 'qrModal')">
-    <div class="modal-card">
-      <button class="modal-close" type="button" aria-label="Đóng" onclick="closeModal('qrModal')">×</button>
-      <h2 id="qrTitle">QR thanh toán</h2>
-      <img id="qrImage" class="qr-img" src="" alt="Mã QR thanh toán">
-      <div class="modal-actions"><a id="qrDownload" class="small-btn success" href="" download>Tải QR</a><button class="small-btn" type="button" onclick="closeModal('qrModal')">Đóng</button></div>
+
+  <!-- Modal: QR (giống Anhsime) -->
+  <div id="qrModal" class="modal" onclick="backdropClose(event, 'qrModal')">
+    <div class="modal-content">
+      <h2>📷 QR Thanh toán</h2>
+      <img id="qrImage" src="" alt="QR Code" class="qr-img"/>
+      <a id="qrDownload" href="" download class="download-link">⬇️ Tải QR</a>
+      <button class="mt-2 px-3 py-2 bg-gray-500 rounded-lg text-sm" onclick="closeModal('qrModal')">Đóng</button>
     </div>
   </div>
-  <div id="avatarModal" class="modal" role="dialog" aria-modal="true" aria-label="Ảnh đại diện" onclick="backdropClose(event, 'avatarModal')">
-    <div class="modal-card"><button class="modal-close" type="button" aria-label="Đóng" onclick="closeModal('avatarModal')">×</button><img class="avatar-large" src="/static/avatarcuatoi.jpg" alt="Ảnh đại diện của Vương Lộc Trường"></div>
+
+  <!-- Modal: Avatar -->
+  <div id="avatarModal" class="modal" onclick="backdropClose(event,'avatarModal')">
+    <div class="modal-content" style="background:transparent; border:none; padding:0; width:auto;">
+      <img src="/static/avatarcuatoi.jpg" alt="Avatar full" class="avatar-img"/>
+      <button class="mt-3 px-3 py-2 bg-gray-700 rounded-lg text-sm text-white" onclick="closeModal('avatarModal')">Đóng</button>
+    </div>
   </div>
-  <div id="toast" class="toast" role="status">Đã copy email</div>
 
   <script>
     const CHATBOT_URL = "https://vlt-chatbot.fly.dev/";
-    const CONTACT_EMAIL = "vuongloctruong95@gmail.com";
+    let didRedirect = false;
     let chatbotTimer = null;
-    let chatbotPoll = null;
-    let redirected = false;
-    function openModal(id) {
-      const modal = document.getElementById(id);
-      modal.classList.add("is-open");
-      modal.querySelector(".modal-close")?.focus();
+    let chatbotPoll  = null;
+
+    function openModal(id){ document.getElementById(id).style.display='flex'; }
+    function closeModal(id){ document.getElementById(id).style.display='none'; }
+    function backdropClose(e, id){ if(e.target.id === id){ closeModal(id); } }
+
+    function showAvatar(){ openModal('avatarModal'); }
+    function goNow(){ window.location.assign(CHATBOT_URL); }
+
+    function showQR(path){
+      document.getElementById('qrImage').src = path;
+      document.getElementById('qrDownload').href = path;
+      openModal('qrModal');
     }
-    function closeModal(id) {
-      document.getElementById(id).classList.remove("is-open");
-      if (id === "chatbotModal") {
-        clearInterval(chatbotTimer); clearInterval(chatbotPoll);
-        chatbotTimer = null; chatbotPoll = null;
-      }
-    }
-    function backdropClose(event, id) { if (event.target.id === id) closeModal(id); }
-    document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape") {
-        const openModalElement = document.querySelector(".modal.is-open");
-        if (openModalElement) closeModal(openModalElement.id);
-      }
-    });
-    function showQR(path) {
-      document.getElementById("qrImage").src = path;
-      document.getElementById("qrDownload").href = path;
-      openModal("qrModal");
-    }
-    function goToChatbot() {
-      if (redirected) return;
-      redirected = true;
-      clearInterval(chatbotTimer); clearInterval(chatbotPoll);
-      window.location.assign(CHATBOT_URL);
-    }
-    function openChatbot() {
-      openModal("chatbotModal");
+
+    function openChatbot(){
+      openModal('chatbotModal');
+
+      // Nếu đã có timer/poll thì không tạo mới
       if (chatbotTimer || chatbotPoll) return;
-      let seconds = 20;
-      const count = document.getElementById("count");
-      const bar = document.getElementById("bar");
-      const status = document.getElementById("chatbotStatus");
-      const poll = () => fetch(CHATBOT_URL + "health?t=" + Date.now(), { cache: "no-store" })
-        .then((response) => { if (response.ok) { status.textContent = "Chatbot đã sẵn sàng."; bar.style.width = "100%"; setTimeout(goToChatbot, 300); } })
-        .catch(() => {});
-      poll();
-      chatbotPoll = setInterval(poll, 1500);
-      chatbotTimer = setInterval(() => {
-        seconds = Math.max(0, seconds - 1);
-        count.textContent = seconds;
-        bar.style.width = ((1 - seconds / 20) * 100) + "%";
-        if (seconds === 0) goToChatbot();
+
+      let sec = 20;
+      const total = sec;
+      const $c = document.getElementById('count');
+      const $s = document.getElementById('status');
+      const $bar = document.getElementById('bar');
+
+      chatbotTimer = setInterval(()=>{
+        if(didRedirect) return;
+        sec = Math.max(0, sec - 1);
+        $c.textContent = sec;
+        const pct = Math.min(100, Math.round((1 - sec/total) * 100));
+        $bar.style.width = pct + "%";
+        if(sec <= 0 && !didRedirect){
+          didRedirect = true;
+          clearInterval(chatbotTimer);
+          clearInterval(chatbotPoll);
+          chatbotTimer = null;
+          chatbotPoll  = null;
+          window.location.assign(CHATBOT_URL);
+        }
       }, 1000);
-    }
-    async function copyEmail() {
-      try { await navigator.clipboard.writeText(CONTACT_EMAIL); }
-      catch (_) { window.prompt("Sao chép email:", CONTACT_EMAIL); return; }
-      const toast = document.getElementById("toast");
-      toast.classList.add("show");
-      setTimeout(() => toast.classList.remove("show"), 1800);
+
+      chatbotPoll = setInterval(()=>{
+        if(didRedirect) return;
+        fetch(CHATBOT_URL + "health?t=" + Date.now(), {cache:"no-store"})
+          .then(r=>{
+            if(r.ok && !didRedirect){
+              didRedirect = true;
+              clearInterval(chatbotTimer);
+              clearInterval(chatbotPoll);
+              chatbotTimer = null;
+              chatbotPoll  = null;
+              $s.textContent = "✅ Chatbot đã sẵn sàng!";
+              $bar.style.width = "100%";
+              setTimeout(()=>{ window.location.assign(CHATBOT_URL); }, 500);
+            }
+          })
+          .catch(()=>{});
+      }, 2000);
     }
   </script>
 </body>
-</html>"""
-
+</html>
+"""
 
 @app.get("/", response_class=HTMLResponse)
-def index() -> HTMLResponse:
-    return HTMLResponse(HTML, headers={"Cache-Control": "public, max-age=60, s-maxage=60"})
-
+def index():
+    return HTMLResponse(HTML, headers={"Cache-Control": "no-store"})
 
 @app.get("/health")
-def health() -> dict[str, str]:
+def health():
     return {"status": "ok"}
-
-
-@app.middleware("http")
-async def cache_static_files(request, call_next):
-    response = await call_next(request)
-    if request.url.path.startswith("/static/"):
-        response.headers.setdefault("Cache-Control", "public, max-age=86400, s-maxage=86400")
-    return response
