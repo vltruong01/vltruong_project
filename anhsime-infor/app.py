@@ -79,7 +79,22 @@ HTML = """
     .qr-img { width:260px; max-width:90%; margin:12px auto; border-radius:9px; }
 
     /* Avatar modal */
-    .avatar-img { max-width:90vw; max-height:80vh; border-radius:12px; }
+    .avatar {
+      display:block;
+      width:132px;
+      height:132px;
+      margin:0 auto;
+      padding:4px;
+      border:0;
+      border-radius:50%;
+      background:linear-gradient(135deg, #60a5fa, #34d399);
+      cursor:zoom-in;
+    }
+    .avatar img { display:block; width:100%; height:100%; border-radius:50%; object-fit:cover; }
+    .avatar-img { display:block; max-width:100%; max-height:76vh; margin:0 auto; border-radius:12px; object-fit:contain; }
+    .avatar-modal-card { position:relative; width:min(410px, 100%); padding:24px; border:1px solid #334155; border-radius:16px; background:#17243a; box-shadow:0 24px 70px rgba(0,0,0,.3); text-align:center; }
+    .modal-close { position:absolute; top:10px; right:10px; width:34px; height:34px; border:0; border-radius:50%; color:#a8b4c7; background:transparent; font-size:23px; cursor:pointer; }
+    .modal-close:hover { color:#f8fafc; background:rgba(148,163,184,.14); }
     .link-btn:focus-visible, .copy-btn:focus-visible, .view-btn:focus-visible,
     .modal button:focus-visible, .download-link:focus-visible {
       outline:3px solid rgba(96,165,250,.55); outline-offset:3px;
@@ -88,7 +103,9 @@ HTML = """
     .avatar-trigger { display:block; padding:0; border:0; background:transparent; }
     @media (max-width:520px) {
       body { padding:12px; }
+      .avatar { width:116px; height:116px; }
       .modal-content { padding:20px 16px; }
+      .avatar-modal-card { padding:22px 16px; }
     }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { scroll-behavior:auto !important; transition:none !important; }
@@ -100,8 +117,8 @@ HTML = """
     <section class="bg-slate-900/60 backdrop-blur rounded-2xl border border-slate-700/60 shadow-xl p-5 md:p-6 text-center">
 
       <!-- Avatar có onclick mở modal -->
-      <button class="avatar-trigger mx-auto w-[145px] h-[145px] rounded-full ring-4 ring-blue-500/30 overflow-hidden shadow-lg cursor-pointer" type="button" onclick="showAvatar()" aria-label="Xem ảnh đại diện lớn">
-        <img alt="Ảnh đại diện của Nguyễn Ngọc Ánh" class="w-full h-full object-cover" src="/static/avatar.jpg" />
+      <button class="avatar" type="button" onclick="showAvatar()" aria-label="Xem ảnh đại diện lớn">
+        <img alt="Ảnh đại diện của Nguyễn Ngọc Ánh" src="/static/avatar.jpg" width="132" height="132" fetchpriority="high" />
       </button>
 
       <h1 class="mt-4 text-2xl md:text-3xl font-bold tracking-tight">Nguyễn Ngọc Ánh</h1>
@@ -178,9 +195,9 @@ HTML = """
 
   <!-- Modal: Avatar -->
   <div id="avatarModal" class="modal" role="dialog" aria-modal="true" aria-label="Ảnh đại diện" onclick="backdropClose(event, 'avatarModal')">
-    <div class="modal-content" style="background:transparent; border:none; padding:0; width:auto;">
-      <img src="/static/avatar.jpg" alt="Avatar full" class="avatar-img"/>
-      <button class="mt-3 px-3 py-2 bg-gray-700 rounded-lg text-sm text-white" onclick="closeModal('avatarModal')">Đóng</button>
+    <div class="avatar-modal-card">
+      <button class="modal-close" type="button" aria-label="Đóng" onclick="closeModal('avatarModal')">×</button>
+      <img src="/static/avatar.jpg" alt="Ảnh đại diện của Nguyễn Ngọc Ánh" class="avatar-img"/>
     </div>
   </div>
 
