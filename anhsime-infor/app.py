@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 
-app = FastAPI(title="Anhsime Infor", version="1.0")
+app = FastAPI(title="Anhsime Infor", version="1.1")
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
@@ -16,7 +16,13 @@ HTML = """
   <link rel="icon" type="image/png" href="/static/fav.png" />
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
+    :root { color-scheme: dark; }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
     body{
+      min-width:320px;
+      min-height:100vh;
+      margin:0;
       background:
         radial-gradient(1000px 500px at 10% -10%, rgba(59,130,246,.12), transparent 50%),
         radial-gradient(700px 350px at 100% 0%, rgba(139,92,246,.12), transparent 40%),
@@ -39,7 +45,9 @@ HTML = """
     }
     .modal-content {
       background:#1e293b; padding:24px; border-radius:14px;
-      width:380px; text-align:center; color:#e2e8f0;
+      width:min(380px, calc(100vw - 32px)); max-height:92vh; overflow:auto;
+      text-align:center; color:#e2e8f0;
+      border:1px solid #334155;
     }
     .modal h2 { font-size:18px; font-weight:700; margin-bottom:12px; }
 
@@ -72,6 +80,19 @@ HTML = """
 
     /* Avatar modal */
     .avatar-img { max-width:90vw; max-height:80vh; border-radius:12px; }
+    .link-btn:focus-visible, .copy-btn:focus-visible, .view-btn:focus-visible,
+    .modal button:focus-visible, .download-link:focus-visible {
+      outline:3px solid rgba(96,165,250,.55); outline-offset:3px;
+    }
+    .modal-content > button { cursor:pointer; }
+    .avatar-trigger { display:block; padding:0; border:0; background:transparent; }
+    @media (max-width:520px) {
+      body { padding:12px; }
+      .modal-content { padding:20px 16px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior:auto !important; transition:none !important; }
+    }
   </style>
 </head>
 <body class="min-h-screen text-slate-100 antialiased">
@@ -79,9 +100,9 @@ HTML = """
     <section class="bg-slate-900/60 backdrop-blur rounded-2xl border border-slate-700/60 shadow-xl p-5 md:p-6 text-center">
 
       <!-- Avatar có onclick mở modal -->
-      <div class="mx-auto w-[145px] h-[145px] rounded-full ring-4 ring-blue-500/30 overflow-hidden shadow-lg cursor-pointer" onclick="showAvatar()">
-        <img alt="avatar" class="w-full h-full object-cover" src="/static/avatar.jpg" />
-      </div>
+      <button class="avatar-trigger mx-auto w-[145px] h-[145px] rounded-full ring-4 ring-blue-500/30 overflow-hidden shadow-lg cursor-pointer" type="button" onclick="showAvatar()" aria-label="Xem ảnh đại diện lớn">
+        <img alt="Ảnh đại diện của Nguyễn Ngọc Ánh" class="w-full h-full object-cover" src="/static/avatar.jpg" />
+      </button>
 
       <h1 class="mt-4 text-2xl md:text-3xl font-bold tracking-tight">Nguyễn Ngọc Ánh</h1>
       <p class="mt-1 text-slate-300 text-[14.5px]">Đây là infor của mình ^^</p>
@@ -92,16 +113,16 @@ HTML = """
           🤖 Chatbot giới thiệu Anhsime
         </button>
 
-        <a href="https://zalo.me/84945529606" target="_blank" class="link-btn w-full border border-cyan-500/40 bg-cyan-600/20 hover:bg-cyan-600/30">
+        <a href="https://zalo.me/84945529606" target="_blank" rel="noopener noreferrer" class="link-btn w-full border border-cyan-500/40 bg-cyan-600/20 hover:bg-cyan-600/30">
           <img src="/static/icons/zalo.png"/>Zalo
         </a>
-        <a href="https://www.instagram.com/anhsimee" target="_blank" class="link-btn w-full border border-pink-500/40 bg-pink-600/20 hover:bg-pink-600/30">
+        <a href="https://www.instagram.com/anhsimee" target="_blank" rel="noopener noreferrer" class="link-btn w-full border border-pink-500/40 bg-pink-600/20 hover:bg-pink-600/30">
           <img src="/static/icons/instagram.png"/>Instagram
         </a>
-        <a href="https://www.tiktok.com/@anhsime" target="_blank" class="link-btn w-full border border-rose-500/40 bg-rose-600/20 hover:bg-rose-600/30">
+        <a href="https://www.tiktok.com/@anhsime" target="_blank" rel="noopener noreferrer" class="link-btn w-full border border-rose-500/40 bg-rose-600/20 hover:bg-rose-600/30">
           <img src="/static/icons/tiktok.png"/>TikTok
         </a>
-        <a href="https://locket.camera/links/h6TKJzCoGGVz9n9u6" target="_blank" class="link-btn w-full border border-yellow-500/40 bg-yellow-600/20 hover:bg-yellow-600/30">
+        <a href="https://locket.camera/links/h6TKJzCoGGVz9n9u6" target="_blank" rel="noopener noreferrer" class="link-btn w-full border border-yellow-500/40 bg-yellow-600/20 hover:bg-yellow-600/30">
           <img src="/static/icons/locket.png"/>Locket
         </a>
         <button onclick="openModal('gameModal')" class="link-btn w-full border border-green-500/40 bg-green-600/20 hover:bg-green-600/30">
@@ -117,18 +138,18 @@ HTML = """
   </main>
 
   <!-- THÊM MỚI: Modal Chatbot chưa hoạt động -->
-  <div id="chatbotModal" class="modal" onclick="backdropClose(event, 'chatbotModal')">
+  <div id="chatbotModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="chatbotTitle" onclick="backdropClose(event, 'chatbotModal')">
     <div class="modal-content">
-      <h2>🤖 Chatbot này chưa hoạt động</h2>
+      <h2 id="chatbotTitle">🤖 Chatbot này chưa hoạt động</h2>
       <p class="text-slate-300 text-[14.5px]">Hiện tại chatbot của Anhsime chưa được bật. Bạn quay lại sau nha ^^</p>
       <button class="mt-3 px-3 py-2 bg-gray-500 rounded-lg text-sm" onclick="closeModal('chatbotModal')">Đóng</button>
     </div>
   </div>
 
   <!-- Modal: Games -->
-  <div id="gameModal" class="modal" onclick="backdropClose(event, 'gameModal')">
+  <div id="gameModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="gameTitle" onclick="backdropClose(event, 'gameModal')">
     <div class="modal-content">
-      <h2>🎮 Các game đang chơi</h2>
+      <h2 id="gameTitle">🎮 Các game đang chơi</h2>
       <div class="list-item"><div class="left"><img src="/static/icons/lienquan.png"/><span>Liên Quân: <b>anhsime</b></span></div><button class="copy-btn" onclick="copyText('anhsime')">Copy tên</button></div>
       <div class="list-item"><div class="left"><img src="/static/icons/playtogether.png"/><span>Play Together: <b>anhsime</b></span></div><button class="copy-btn" onclick="copyText('anhsime')">Copy tên</button></div>
       <button class="mt-3 px-3 py-2 bg-gray-500 rounded-lg text-sm" onclick="closeModal('gameModal')">Đóng</button>
@@ -136,9 +157,9 @@ HTML = """
   </div>
 
   <!-- Modal: Bank -->
-  <div id="bankModal" class="modal" onclick="backdropClose(event, 'bankModal')">
+  <div id="bankModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="bankTitle" onclick="backdropClose(event, 'bankModal')">
     <div class="modal-content">
-      <h2>💳 Tài khoản thanh toán</h2>
+      <h2 id="bankTitle">💳 Tài khoản thanh toán</h2>
       <div class="list-item"><div class="left"><img src="/static/icons/ocb.png"/><span>OCB</span></div><button class="view-btn" onclick="showQR('/static/qr/qr_ocb.jpg')">Xem QR</button></div>
       <div class="list-item"><div class="left"><img src="/static/icons/momo.png"/><span>MoMo</span></div><button class="view-btn" onclick="showQR('/static/qr/qr_momo.jpg')">Xem QR</button></div>
       <button class="mt-3 px-3 py-2 bg-gray-500 rounded-lg text-sm" onclick="closeModal('bankModal')">Đóng</button>
@@ -146,9 +167,9 @@ HTML = """
   </div>
 
   <!-- Modal: QR -->
-  <div id="qrModal" class="modal" onclick="backdropClose(event, 'qrModal')">
+  <div id="qrModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="qrTitle" onclick="backdropClose(event, 'qrModal')">
     <div class="modal-content">
-      <h2>📷 QR Thanh toán</h2>
+      <h2 id="qrTitle">📷 QR Thanh toán</h2>
       <img id="qrImage" src="" alt="QR Code" class="qr-img"/>
       <a id="qrDownload" href="" download class="download-link">⬇️ Tải QR</a>
       <button class="mt-2 px-3 py-2 bg-gray-500 rounded-lg text-sm" onclick="closeModal('qrModal')">Đóng</button>
@@ -156,7 +177,7 @@ HTML = """
   </div>
 
   <!-- Modal: Avatar -->
-  <div id="avatarModal" class="modal" onclick="backdropClose(event, 'avatarModal')">
+  <div id="avatarModal" class="modal" role="dialog" aria-modal="true" aria-label="Ảnh đại diện" onclick="backdropClose(event, 'avatarModal')">
     <div class="modal-content" style="background:transparent; border:none; padding:0; width:auto;">
       <img src="/static/avatar.jpg" alt="Avatar full" class="avatar-img"/>
       <button class="mt-3 px-3 py-2 bg-gray-700 rounded-lg text-sm text-white" onclick="closeModal('avatarModal')">Đóng</button>
@@ -164,12 +185,29 @@ HTML = """
   </div>
 
   <script>
-    function openModal(id){ document.getElementById(id).style.display='flex'; }
+    function openModal(id){
+      const modal = document.getElementById(id);
+      modal.style.display='flex';
+      modal.querySelector('button')?.focus();
+    }
     function closeModal(id){ document.getElementById(id).style.display='none'; }
     function backdropClose(e, id){ if(e.target.id === id){ closeModal(id); } }
-    function copyText(text){ navigator.clipboard.writeText(text).then(()=>{ alert('Đã copy: ' + text); }); }
+    async function copyText(text){
+      try {
+        await navigator.clipboard.writeText(text);
+        alert('Đã copy: ' + text);
+      } catch (_) {
+        window.prompt('Sao chép tên:', text);
+      }
+    }
     function showQR(path){ document.getElementById('qrImage').src = path; document.getElementById('qrDownload').href = path; openModal('qrModal'); }
     function showAvatar(){ openModal('avatarModal'); }
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        const modal = document.querySelector('.modal[style*="display: flex"]');
+        if (modal) closeModal(modal.id);
+      }
+    });
   </script>
 </body>
 </html>
@@ -177,8 +215,16 @@ HTML = """
 
 @app.get("/", response_class=HTMLResponse)
 def index():
-    return HTMLResponse(HTML, headers={"Cache-Control": "no-store"})
+    return HTMLResponse(HTML, headers={"Cache-Control": "public, max-age=60, s-maxage=60"})
 
 @app.get("/health")
 def health():
     return {"status": "ok"}
+
+
+@app.middleware("http")
+async def cache_static_files(request, call_next):
+    response = await call_next(request)
+    if request.url.path.startswith("/static/"):
+        response.headers.setdefault("Cache-Control", "public, max-age=86400, s-maxage=86400")
+    return response
